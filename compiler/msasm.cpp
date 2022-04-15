@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
 
     if(argc!=3)
     {
-        cout<<"Usage: ./msasm <filename> <filename>"<<endl;
+        cout<<"Usage: ./msasm <inputFile> <outputFile>"<<endl;
         return 1;
     }
 
