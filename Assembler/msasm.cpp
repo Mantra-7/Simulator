@@ -5,6 +5,7 @@ void processLine(string);
 map<string,char> reg;
 bool invalid = false;
 ofstream res;
+int lne = 0;
 
 int main(int argc, char const *argv[])
 {
@@ -36,6 +37,7 @@ int main(int argc, char const *argv[])
     string line;
     while(!invalid && getline(fin, line))
     {
+        lne++;
         processLine(line);
     }
 }
@@ -60,7 +62,7 @@ void processADD(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -68,7 +70,7 @@ void processADD(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -77,7 +79,7 @@ void processADD(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -91,7 +93,7 @@ void processADD(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -99,7 +101,7 @@ void processADD(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -108,7 +110,7 @@ void processADD(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -122,7 +124,7 @@ void processADD(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -130,7 +132,7 @@ void processADD(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -139,7 +141,7 @@ void processADD(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -147,7 +149,7 @@ void processADD(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -173,7 +175,7 @@ void processSUB(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -181,7 +183,7 @@ void processSUB(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -190,7 +192,7 @@ void processSUB(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -204,7 +206,7 @@ void processSUB(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -212,7 +214,7 @@ void processSUB(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -221,7 +223,7 @@ void processSUB(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -235,7 +237,7 @@ void processSUB(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -243,7 +245,7 @@ void processSUB(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -252,7 +254,7 @@ void processSUB(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -260,7 +262,7 @@ void processSUB(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -286,7 +288,7 @@ void processMUL(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -294,7 +296,7 @@ void processMUL(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -303,7 +305,7 @@ void processMUL(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -317,7 +319,7 @@ void processMUL(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -325,7 +327,7 @@ void processMUL(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -334,7 +336,7 @@ void processMUL(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -348,7 +350,7 @@ void processMUL(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -356,7 +358,7 @@ void processMUL(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -365,7 +367,7 @@ void processMUL(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -373,7 +375,7 @@ void processMUL(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -399,7 +401,7 @@ void processINC(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -407,7 +409,7 @@ void processINC(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -416,7 +418,7 @@ void processINC(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -424,7 +426,7 @@ void processINC(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -452,7 +454,7 @@ void processAND(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -460,7 +462,7 @@ void processAND(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -469,7 +471,7 @@ void processAND(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -483,7 +485,7 @@ void processAND(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -491,7 +493,7 @@ void processAND(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -500,7 +502,7 @@ void processAND(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -514,7 +516,7 @@ void processAND(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -522,7 +524,7 @@ void processAND(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -531,7 +533,7 @@ void processAND(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -539,7 +541,7 @@ void processAND(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -565,7 +567,7 @@ void processOR(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -573,7 +575,7 @@ void processOR(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -582,7 +584,7 @@ void processOR(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -596,7 +598,7 @@ void processOR(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -604,7 +606,7 @@ void processOR(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -613,7 +615,7 @@ void processOR(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -627,7 +629,7 @@ void processOR(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -635,7 +637,7 @@ void processOR(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -644,7 +646,7 @@ void processOR(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -652,7 +654,7 @@ void processOR(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -678,7 +680,7 @@ void processXOR(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -686,7 +688,7 @@ void processXOR(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -695,7 +697,7 @@ void processXOR(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -709,7 +711,7 @@ void processXOR(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -717,7 +719,7 @@ void processXOR(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -726,7 +728,7 @@ void processXOR(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -740,7 +742,7 @@ void processXOR(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -748,7 +750,7 @@ void processXOR(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -757,7 +759,7 @@ void processXOR(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -765,7 +767,7 @@ void processXOR(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -791,7 +793,7 @@ void processNOT(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -799,7 +801,7 @@ void processNOT(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -808,7 +810,7 @@ void processNOT(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -822,7 +824,7 @@ void processNOT(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -830,7 +832,7 @@ void processNOT(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -839,7 +841,7 @@ void processNOT(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -847,7 +849,7 @@ void processNOT(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -874,7 +876,7 @@ void processLOAD(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -882,7 +884,7 @@ void processLOAD(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -891,7 +893,7 @@ void processLOAD(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -905,7 +907,7 @@ void processLOAD(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -913,7 +915,7 @@ void processLOAD(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -922,7 +924,7 @@ void processLOAD(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -933,7 +935,7 @@ void processLOAD(string line)
     if(r.empty())
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid=true;
         return;
     }
@@ -941,7 +943,7 @@ void processLOAD(string line)
     if(x<0 || x>15)
     {
         cout<<"Error: Invalid immediate value"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -950,7 +952,7 @@ void processLOAD(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -976,7 +978,7 @@ void processSTORE(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -984,7 +986,7 @@ void processSTORE(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -993,7 +995,7 @@ void processSTORE(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1007,7 +1009,7 @@ void processSTORE(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -1015,7 +1017,7 @@ void processSTORE(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -1024,7 +1026,7 @@ void processSTORE(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1035,7 +1037,7 @@ void processSTORE(string line)
     if(r.empty())
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid=true;
         return;
     }
@@ -1043,7 +1045,7 @@ void processSTORE(string line)
     if(x<0 || x>15)
     {
         cout<<"Error: Invalid immediate value"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1052,7 +1054,7 @@ void processSTORE(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1077,7 +1079,7 @@ void processJMP(string line)
     if(r.empty())
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1086,7 +1088,7 @@ void processJMP(string line)
     if(x<0 || x>255)
     {
         cout<<"Error: Invalid immediate value"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1100,7 +1102,7 @@ void processJMP(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1127,7 +1129,7 @@ void processBEQZ(string line)
         if(r.empty())
         {
             cout<<"Error: Less Arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid=true;
             return;
         }
@@ -1135,7 +1137,7 @@ void processBEQZ(string line)
         if(reg.find(r)==reg.end())
         {
             cout<<"Error: Invalid register"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -1144,7 +1146,7 @@ void processBEQZ(string line)
     else
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1155,7 +1157,7 @@ void processBEQZ(string line)
     if(r.empty())
     {
         cout<<"Error: Less Arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid=true;
         return;
     }
@@ -1163,7 +1165,7 @@ void processBEQZ(string line)
     if(x<0 || x>255)
     {
         cout<<"Error: Invalid immediate value"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1177,7 +1179,7 @@ void processBEQZ(string line)
     if(getline(ss,r,','))
     {
         cout<<"Error: Too many arguments"<<endl;
-        cout<<"in line: "<<line<<endl;
+        cout<<"in line "<<lne<<" : "<<line<<endl;
         invalid = true;
         return;
     }
@@ -1206,7 +1208,7 @@ void processHLT(string line)
         if(!r.empty())
         { 
             cout<<"Error: Too many arguments"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
@@ -1238,7 +1240,7 @@ void processLine(string line)
         else
         {
             cout<<"Error: Invalid instruction"<<endl;
-            cout<<"in line: "<<line<<endl;
+            cout<<"in line "<<lne<<" : "<<line<<endl;
             invalid = true;
             return;
         }
