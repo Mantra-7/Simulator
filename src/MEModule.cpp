@@ -1,6 +1,6 @@
 #include "Structures.hpp"
 
-void MEModule::ME()
+void MEModule::run()
 {
     if(!exmebuf.valid)
     {

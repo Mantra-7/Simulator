@@ -1,6 +1,6 @@
 #include "Structures.hpp"
 
-void IFModule::IF() 
+void IFModule::run() 
 {
     if(stall) 
     {

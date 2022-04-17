@@ -65,17 +65,18 @@ public:
 };
 
 class IFModule{
+public:
     PC &pc;
     Register16 &IR;
     ICache &I$;
     IFIDBuffer &ifidbuf;
     flag stall;
-public:
+    IFModule();
     IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf)
     {
         stall = false;
     }
-    void IF();
+    void run();
 };
 
 class IFIDBuffer{
@@ -90,6 +91,7 @@ public:
 
 class IDRFModule{
 public:
+    IDRFModule();
     IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT)
     {
         stall = false;
@@ -100,7 +102,7 @@ public:
     IDEXBuffer &idexbuf;
     flag &halt;
     flag stall;
-    void IDRF();
+    void run();
 };
 
 class IDEXBuffer{
@@ -126,6 +128,7 @@ public:
 
 class EXModule{
 public: 
+    EXModule();
     EXModule(ALU &alu, PC &pc, RegisterFile &rf, IDEXBuffer &idexbuf, EXMEBuffer &exmebuf) : alu(alu), pc(pc), RF(rf), idexbuf(idexbuf), exmebuf(exmebuf) {}
     ALU &alu;
     PC &pc;
@@ -134,7 +137,7 @@ public:
     EXMEBuffer &exmebuf;
 
     flag stall;
-    void EX();
+    void run();
 };
 
 class EXMEBuffer{
@@ -152,13 +155,14 @@ public:
 
 class MEModule{
 public:
+    MEModule();
     MEModule(DCache &D$, EXMEBuffer &exmebuf, MEWBBuffer &mewbbuf, Register &LMD) : D$(D$), exmebuf(exmebuf), mewbbuf(mewbbuf), LMD(LMD){}
     DCache &D$;
     EXMEBuffer &exmebuf;
     MEWBBuffer &mewbbuf;
     Register &LMD;
     flag stall;
-    void ME();
+    void run();
 };
 
 class MEWBBuffer
@@ -179,12 +183,13 @@ class WBModule{
 public:
     flag valid;
     flag stall;
+    WBModule();
     WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) {}
     RegisterFile &RF;
     MEWBBuffer &mewbbuf;
     Register &LMD;
     int alu_result;
-    void WB();
+    void run();
 };
 
 class ALU
@@ -215,15 +220,17 @@ public:
     IDEXBuffer IDEX1;
     IDEXBuffer IDEX2;
     EXModule EX;
-    EXMEBuffer EM1;
-    EXMEBuffer EM2;
+    EXMEBuffer EXME1;
+    EXMEBuffer EXME2;
     MEModule MEM;
-    MEWBBuffer MW1;
-    MEWBBuffer MW2;
+    MEWBBuffer MEWB1;
+    MEWBBuffer MEWB2;
     WBModule WB;
 
+    ALU alu;
     flag halt;
 
+    Processor();
     void run();
 };
 

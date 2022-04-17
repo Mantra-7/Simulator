@@ -1,6 +1,6 @@
 #include "Structures.hpp"
 
-void EXModule::EX()
+void EXModule::run()
 {
     if(!idexbuf.valid)
     {

@@ -1,6 +1,6 @@
 #include "Structures.hpp"
 
-void IDRFModule::IDRF()
+void IDRFModule::run()
 {
     if(!ifidbuf.valid)
     {

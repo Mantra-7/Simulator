@@ -1,6 +1,6 @@
 #include "Structures.hpp"
 
-void WBModule::WB()
+void WBModule::run()
 {
     if(!mewbbuf.valid)
     {
