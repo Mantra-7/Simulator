@@ -44,17 +44,19 @@ typedef struct Block{
 class ICache{
     Block m_data[NUM_SETS];
 public:
+    ICache();
+    ICache(ifstream &fin);
     int16 request(int8 addr);
     void write(int8 addr, int16 val);
-    void readIntoCache(ifstream fin);
 };
 
 class DCache{
     Block m_data[NUM_SETS];
 public:
+    DCache();
+    DCache(ifstream &fin);
     int8 request(int8 addr);
     void write(int8 addr, int8 val);
-    void readIntoCache(ifstream fin); 
 };
 
 class PC
@@ -232,7 +234,7 @@ public:
     ALU alu;
     flag halt;
 
-    Processor();
+    Processor(ifstream &icache, ifstream &dcache);
     void run();
 };
 
