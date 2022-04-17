@@ -1,7 +1,10 @@
 #include "Structures.hpp"
 
-Processor::Processor()
+Processor::Processor(ifstream &icache, ifstream &dcache)
 {
+    I$ = ICache(icache);
+    D$ = DCache(dcache);
+    halt = false;
     IFModule IF(pc, I$, IR, IFID1);
     IDRFModule IDRF(rf, D$, IFID2, IDEX1, halt);
     EXModule EX(alu, pc, rf, IDEX2, EXME1);

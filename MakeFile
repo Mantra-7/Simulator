@@ -1,0 +1,20 @@
+OUT = simm
+BINDIR = bin
+OBJDIR = obj
+SRCDIR = src
+INCDIR = include
+SRCS = $(wildcard $(SRCDIR)/*.cpp)
+OBJS = $(OBJDIR)/$(patsubst %.cpp,%.o,$(SRCDIR))
+CC = g++
+CFLAGS = -Wall -g -w
+
+$(BINDIR)/$(OUT): $(OBJS)
+	$(CC) $(OBJS) -o $(BINDIR)/$(OUT)
+	chmod 777 $(BINDIR)/$(OUT)
+
+$(OBJDIR)/$(patsubst %.cpp,%.o,$(SRCDIR)): $(INCDIR)/Structures.hpp
+	$(CC) $(CFLAGS) -c $<
+	chmod 777 $(OBJDIR)/$(patsubst %.cpp,%.o,$(SRCDIR))
+
+clean:
+	rm -f $(BINDIR)/$(OUT) $(OBJS)

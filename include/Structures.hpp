@@ -68,19 +68,16 @@ public:
     void increment();
 };
 
-class IFModule{
+class ALU
+{
 public:
-    PC &pc;
-    Register16 &IR;
-    ICache &I$;
-    IFIDBuffer &ifidbuf;
-    flag stall;
-    IFModule();
-    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf)
-    {
-        stall = false;
-    }
-    void run();
+    int8 adder(int8 X , int8 Y, flag as);
+    int8 MUL(int8 X, int8 Y);
+    int8 AND(int8 X, int8 Y);
+    int8 OR(int8 X, int8 Y);
+    int8 NOT(int8 X);
+    int8 XOR(int8 X, int8 Y);
+    flag BNEQ(int X);
 };
 
 class IFIDBuffer{
@@ -93,19 +90,18 @@ public:
     void invalidate();
 };
 
-class IDRFModule{
+class IFModule{
 public:
-    IDRFModule();
-    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT)
+    PC &pc;
+    Register16 &IR;
+    ICache &I$;
+    IFIDBuffer &ifidbuf;
+    flag stall;
+    IFModule();
+    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf)
     {
         stall = false;
     }
-    RegisterFile &RF;
-    DCache &D$;
-    IFIDBuffer &ifidbuf;
-    IDEXBuffer &idexbuf;
-    flag &halt;
-    flag stall;
     void run();
 };
 
@@ -130,16 +126,18 @@ public:
     int offset;
 };
 
-class EXModule{
-public: 
-    EXModule();
-    EXModule(ALU &alu, PC &pc, RegisterFile &rf, IDEXBuffer &idexbuf, EXMEBuffer &exmebuf) : alu(alu), pc(pc), RF(rf), idexbuf(idexbuf), exmebuf(exmebuf) {}
-    ALU &alu;
-    PC &pc;
+class IDRFModule{
+public:
+    IDRFModule();
+    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT)
+    {
+        stall = false;
+    }
     RegisterFile &RF;
+    DCache &D$;
+    IFIDBuffer &ifidbuf;
     IDEXBuffer &idexbuf;
-    EXMEBuffer &exmebuf;
-
+    flag &halt;
     flag stall;
     void run();
 };
@@ -157,14 +155,16 @@ public:
     int8 store_src;
 };
 
-class MEModule{
-public:
-    MEModule();
-    MEModule(DCache &D$, EXMEBuffer &exmebuf, MEWBBuffer &mewbbuf, Register &LMD) : D$(D$), exmebuf(exmebuf), mewbbuf(mewbbuf), LMD(LMD){}
-    DCache &D$;
+class EXModule{
+public: 
+    EXModule();
+    EXModule(ALU &alu, PC &pc, RegisterFile &rf, IDEXBuffer &idexbuf, EXMEBuffer &exmebuf) : alu(alu), pc(pc), RF(rf), idexbuf(idexbuf), exmebuf(exmebuf) {}
+    ALU &alu;
+    PC &pc;
+    RegisterFile &RF;
+    IDEXBuffer &idexbuf;
     EXMEBuffer &exmebuf;
-    MEWBBuffer &mewbbuf;
-    Register &LMD;
+
     flag stall;
     void run();
 };
@@ -183,6 +183,18 @@ public:
     int valToWrite;
 };
 
+class MEModule{
+public:
+    MEModule();
+    MEModule(DCache &D$, EXMEBuffer &exmebuf, MEWBBuffer &mewbbuf, Register &LMD) : D$(D$), exmebuf(exmebuf), mewbbuf(mewbbuf), LMD(LMD){}
+    DCache &D$;
+    EXMEBuffer &exmebuf;
+    MEWBBuffer &mewbbuf;
+    Register &LMD;
+    flag stall;
+    void run();
+};
+
 class WBModule{
 public:
     flag valid;
@@ -194,18 +206,6 @@ public:
     Register &LMD;
     int alu_result;
     void run();
-};
-
-class ALU
-{
-public:
-    int8 adder(int8 X , int8 Y, flag as);
-    int8 MUL(int8 X, int8 Y);
-    int8 AND(int8 X, int8 Y);
-    int8 OR(int8 X, int8 Y);
-    int8 NOT(int8 X);
-    int8 XOR(int8 X, int8 Y);
-    flag BNEQ(int X);
 };
 
 class Processor{
