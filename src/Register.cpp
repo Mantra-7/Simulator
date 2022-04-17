@@ -1,4 +1,4 @@
-#include "Structures.hpp"
+#include "../include/Structures.hpp"
 
 int8 Register::read()
 {

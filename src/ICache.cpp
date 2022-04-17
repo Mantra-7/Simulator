@@ -1,4 +1,4 @@
-#include "Structures.hpp"
+#include "../include/Structures.hpp"
 
 int16 ICache::request(int8 addr)
 {
@@ -18,10 +18,11 @@ void ICache::write(int8 addr, int16 val)
     m_data[set].m_offset[offset + 1] = val & 0xff;
 }
 
-void ICache::ICache(ifstream fin)
+ICache::ICache(ifstream &fin)
 {
     int8 addr = 0;
-    while(getline(fin, input))
+    int input;
+    while(fin>>input)
     {
         this->write(addr, input);
         addr += 4;

@@ -1,4 +1,6 @@
-#include "Structures.hpp"
+
+  
+#include "../include/Structures.hpp"
 
 int8 DCache::request(int8 addr)
 {
@@ -14,13 +16,13 @@ void DCache::write(int8 addr, int8 val)
     m_data[set].m_offset[offset] = val;
 }
 
-void DCache::DCache(ifstream fin)
+DCache::DCache(ifstream &fin)
 {
     int8 addr = 0;
-    while(getline(fin, input))
+    int input;
+    while(fin>>input)
     {
         this->write(addr, input);
         addr += 4;
     }
 }
-    

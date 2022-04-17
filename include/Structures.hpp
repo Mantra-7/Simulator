@@ -44,7 +44,7 @@ typedef struct Block{
 class ICache{
     Block m_data[NUM_SETS];
 public:
-    ICache();
+    ICache(){}
     ICache(ifstream &fin);
     int16 request(int8 addr);
     void write(int8 addr, int16 val);
@@ -53,7 +53,7 @@ public:
 class DCache{
     Block m_data[NUM_SETS];
 public:
-    DCache();
+    DCache(){}
     DCache(ifstream &fin);
     int8 request(int8 addr);
     void write(int8 addr, int8 val);

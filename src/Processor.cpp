@@ -1,4 +1,4 @@
-#include "Structures.hpp"
+#include "../include/Structures.hpp"
 
 Processor::Processor(ifstream &icache, ifstream &dcache)
 {

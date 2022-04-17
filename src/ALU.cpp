@@ -1,4 +1,4 @@
-#include "Structures.hpp"
+#include "../include/Structures.hpp"
 
 int8 ALU::adder(int8 X , int8 Y, flag as)
 {
