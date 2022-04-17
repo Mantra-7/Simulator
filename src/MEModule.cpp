@@ -26,4 +26,9 @@ void MEModule::ME()
         mewbbuf.store = true;
     }
 
+    if(exmebuf.halt)
+    {
+        mewbbuf.halt = true;
+        return;
+    }
 }

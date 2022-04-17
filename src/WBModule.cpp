@@ -13,7 +13,8 @@ void WBModule::WB()
     {
         RF.write(mewbbuf.dest, LMD.read());
     }
-    else
+    
+    if(mewbbuf.writeToReg)
     {
         RF.write(mewbbuf.dest, mewbbuf.alu_result);
     }

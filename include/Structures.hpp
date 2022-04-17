@@ -167,8 +167,12 @@ public:
     flag valid;
     flag load;
     flag store;
+    flag writeToReg;
+    flag halt;
+    //flag alu_inst;
     int alu_result;
     int8 dest;
+    int valToWrite;
 };
 
 class WBModule{
@@ -205,16 +209,22 @@ public:
     Register LMD;
 
     IFModule IF;
-    IFIDBuffer IFID;
+    IFIDBuffer IFID1;
+    IFIDBuffer IFID2;
     IDRFModule IDRF;
-    IDEXBuffer IDEX;
+    IDEXBuffer IDEX1;
+    IDEXBuffer IDEX2;
     EXModule EX;
-    EXMEBuffer EM;
+    EXMEBuffer EM1;
+    EXMEBuffer EM2;
     MEModule MEM;
-    MEWBBuffer MW;
+    MEWBBuffer MW1;
+    MEWBBuffer MW2;
     WBModule WB;
 
     flag halt;
+
+    void run();
 };
 
 #endif
