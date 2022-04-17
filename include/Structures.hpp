@@ -168,10 +168,19 @@ public:
     flag load;
     flag store;
     int alu_result;
+    int8 dest;
 };
 
 class WBModule{
-
+public:
+    flag valid;
+    flag stall;
+    WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) {}
+    RegisterFile &RF;
+    MEWBBuffer &mewbbuf;
+    Register &LMD;
+    int alu_result;
+    void WB();
 };
 
 class ALU
