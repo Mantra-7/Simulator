@@ -17,3 +17,13 @@ void ICache::write(int8 addr, int16 val)
     m_data[set].m_offset[offset] = val >> 8;
     m_data[set].m_offset[offset + 1] = val & 0xff;
 }
+
+void ICache::ICache(ifstream fin)
+{
+    int8 addr = 0;
+    while(getline(fin, input))
+    {
+        this->write(addr, input);
+        addr += 4;
+    }
+}
