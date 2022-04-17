@@ -46,6 +46,7 @@ class ICache{
 public:
     int16 request(int8 addr);
     void write(int8 addr, int16 val);
+    void readIntoCache(ifstream fin);
 };
 
 class DCache{
@@ -53,6 +54,7 @@ class DCache{
 public:
     int8 request(int8 addr);
     void write(int8 addr, int8 val);
+    void readIntoCache(ifstream fin); 
 };
 
 class PC
