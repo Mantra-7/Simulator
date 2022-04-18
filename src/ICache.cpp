@@ -1,5 +1,7 @@
 #include "../include/Structures.hpp"
 
+int x=0;
+
 int16 ICache::request(int8 addr)
 {
     int set = addr >> 2;

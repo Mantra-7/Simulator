@@ -9,6 +9,7 @@ int main()
     
     for(int i = 0; i < 16; i+=2)
     {
+        cout<<i<<endl;
         processor.run();
     }
 }

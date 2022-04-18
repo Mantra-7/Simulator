@@ -5,7 +5,7 @@ BIN_DIR := bin
 OUT := simm
 
 simm: $(INC_DIR)/Structures.hpp
-	g++ $(SRC_FILES) -o $(BIN_DIR)/$(OUT) 
+	g++ -g $(SRC_FILES) -o $(BIN_DIR)/$(OUT) 
 
 clean:
 	rm -f $(BIN_DIR)/$(OUT)
