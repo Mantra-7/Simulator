@@ -19,6 +19,7 @@ void IDRFModule::run()
     idexbuf.valid = true;
 
     int16 instruction = ifidbuf.getInstruction();
+    cout << "IDRFModule: " << hex << instruction << endl;
     int16 opcode = instruction >> 12;
     idexbuf.opcode = opcode;
 
