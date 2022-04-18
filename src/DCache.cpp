@@ -13,7 +13,6 @@ void DCache::write(int8 addr, int8 val)
 {
     int set = addr >> 2;
     int offset = addr & 3;
-    cout<<"DCache: "<<offset<<endl;
     m_data[set].m_offset[offset] = val;
 }
 

@@ -2,7 +2,7 @@
 
 void IFModule::run() 
 {
-    if(stall) 
+    if(stall || !branch_resolved)
     {
         ifidbuf.invalidate();
         return;

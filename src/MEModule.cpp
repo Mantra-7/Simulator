@@ -8,13 +8,17 @@ void MEModule::run()
         mewbbuf.valid = false;
         return;
     }
+    cout<<"MEModule: "<<endl;
 
     mewbbuf.alu_result = exmebuf.alu_result;
+    mewbbuf.writeToReg = exmebuf.writeToRegister;
     mewbbuf.dest = exmebuf.dest;
+    mewbbuf.valid = true;
     stall = false;
 
     if(exmebuf.load)
     {
+        cout<<"MEM: Loading from address "<<exmebuf.alu_result<<endl;
         int val = D$.request(exmebuf.alu_result);
         LMD.write(val); 
         mewbbuf.load = true;
@@ -22,6 +26,7 @@ void MEModule::run()
     
     if(exmebuf.store)
     {
+        cout<<"MEM: Storing to address "<<exmebuf.alu_result<<endl;
         D$.write(exmebuf.alu_result, exmebuf.store_src);
         mewbbuf.store = true;
     }

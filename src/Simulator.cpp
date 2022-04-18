@@ -7,9 +7,11 @@ int main()
 
     Processor processor(icache, dcache);
     
-    for(int i = 0; i < 16; i+=2)
+    int cc=1;
+    while(!processor.halt)
     {
-        cout<<i<<endl;
+        cout<<cc++<<endl<<"-------------------------------------------"<<endl;
         processor.run();
+        cout<<"-------------------------------------------"<<endl;
     }
 }

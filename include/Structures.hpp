@@ -97,8 +97,9 @@ public:
     ICache &I$;
     IFIDBuffer &ifidbuf;
     flag stall;
+    flag &branch_resolved;
     IFModule();
-    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf)
+    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf, flag &branch_resolved) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf) , branch_resolved(branch_resolved) 
     {
         stall = false;
     }
@@ -129,7 +130,7 @@ public:
 class IDRFModule{
 public:
     IDRFModule();
-    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT)
+    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT, flag &branch_resolved) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT) , branch_resolved(branch_resolved) 
     {
         stall = false;
     }
@@ -139,6 +140,7 @@ public:
     IDEXBuffer &idexbuf;
     flag &halt;
     flag stall;
+    flag &branch_resolved;
     void run();
 };
 
@@ -159,7 +161,7 @@ public:
 class EXModule{
 public: 
     EXModule();
-    EXModule(ALU &alu, PC &pc, RegisterFile &rf, IDEXBuffer &idexbuf, EXMEBuffer &exmebuf) : alu(alu), pc(pc), RF(rf), idexbuf(idexbuf), exmebuf(exmebuf) {}
+    EXModule(ALU &alu, PC &pc, RegisterFile &rf, IDEXBuffer &idexbuf, EXMEBuffer &exmebuf, flag &branch_resolved) : alu(alu), pc(pc), RF(rf), idexbuf(idexbuf), exmebuf(exmebuf) , branch_resolved(branch_resolved) {}
     ALU &alu;
     PC &pc;
     RegisterFile &RF;
@@ -167,6 +169,7 @@ public:
     EXMEBuffer &exmebuf;
 
     flag stall;
+    flag &branch_resolved;
     void run();
 };
 
@@ -234,11 +237,13 @@ public:
 
     ALU alu;
     flag halt;
+    flag branch_resolved;
 
-    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1) , IDRF(rf, D$, IFID2, IDEX1, halt), EX(alu, pc, rf, IDEX2, EXME1), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD) , I$(icache), D$(dcache)
+    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved) , IDRF(rf, D$, IFID2, IDEX1, halt, branch_resolved), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD) , I$(icache), D$(dcache)
     {
         pc.write(0);
         halt = false;
+        branch_resolved = true;
     }
     void run();
 };

@@ -2,6 +2,13 @@
 
 void IDRFModule::run()
 {
+    if(!branch_resolved)
+    {
+        stall = true;
+        idexbuf.valid = false;
+        return;
+    }
+
     if(!ifidbuf.valid)
     {
         stall = true;
@@ -81,6 +88,7 @@ void IDRFModule::run()
 
     if(opcode == 10)
     {
+        branch_resolved = false;
         idexbuf.jump = true;
         idexbuf.jump_addr = (instruction & 0x0ff0)>>4;
         return;
@@ -88,6 +96,7 @@ void IDRFModule::run()
 
     if(opcode == 11)
     {
+        branch_resolved = false;
         idexbuf.bneq = true;
         int8 r1 = (instruction & 0x0f00)>>8;
         idexbuf.src1 = RF.read(r1);

@@ -14,6 +14,7 @@ void EXModule::run()
 
     if(idexbuf.arithmatic)
     {
+        cout<<"EX: Arithmatic"<<endl;
         exmebuf.writeToRegister = true;
         exmebuf.dest = idexbuf.dest;
         switch(idexbuf.subop)
@@ -37,6 +38,7 @@ void EXModule::run()
 
     if(idexbuf.logical)
     {
+        cout<<"EX: Logical"<<endl;
         exmebuf.writeToRegister = true;
         exmebuf.dest = idexbuf.dest;
         switch(idexbuf.subop)
@@ -59,6 +61,7 @@ void EXModule::run()
         
     if(idexbuf.load)
     {
+        cout<<"EX: Load"<<endl;
         exmebuf.load = true;
         exmebuf.dest = idexbuf.src1;
         exmebuf.alu_result = alu.adder(idexbuf.src2,idexbuf.offset,false);
@@ -67,6 +70,7 @@ void EXModule::run()
 
     if(idexbuf.store)
     {
+        cout<<"EX: Store"<<endl;
         exmebuf.store = true;
         exmebuf.store_src = idexbuf.src1;
         exmebuf.alu_result = alu.adder(idexbuf.src2,idexbuf.offset,false);
@@ -76,16 +80,19 @@ void EXModule::run()
 
     if(idexbuf.jump)
     {
+        cout<<"EX: Jump"<<endl;
         exmebuf.jump = true;
         exmebuf.alu_result = alu.adder(pc.read(),idexbuf.jump_addr << 1,false);
         pc.write(exmebuf.alu_result);
         idexbuf.valid = false;
         stall = true;
+        branch_resolved = true;
         return;
     }
 
     if(idexbuf.bneq)
     {
+        cout<<"EX: BNEQ"<<endl;
         exmebuf.alu_result = alu.BNEQ(idexbuf.src1);
         if(exmebuf.alu_result)
         {
@@ -94,6 +101,7 @@ void EXModule::run()
             idexbuf.valid = false;
             stall = true;
         }
+        branch_resolved = true;
         return;
     }
 }
