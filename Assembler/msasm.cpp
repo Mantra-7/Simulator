@@ -40,6 +40,8 @@ int main(int argc, char const *argv[])
         lne++;
         processLine(line);
     }
+
+    if(invalid) return 1;
 }
 
 
