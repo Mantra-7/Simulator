@@ -19,10 +19,10 @@ void DCache::write(int8 addr, int8 val)
 DCache::DCache(ifstream &fin)
 {
     int8 addr = 0;
-    int input;
-    while(fin>>input)
+    int8 input;
+    while(fin>>hex>>input)
     {
         this->write(addr, input);
-        addr += 4;
+        addr += 1;
     }
 }

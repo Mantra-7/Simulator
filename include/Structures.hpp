@@ -234,10 +234,9 @@ public:
     ALU alu;
     flag halt;
 
-    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1) , IDRF(rf, D$, IFID2, IDEX1, halt), EX(alu, pc, rf, IDEX2, EXME1), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD)
+    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1) , IDRF(rf, D$, IFID2, IDEX1, halt), EX(alu, pc, rf, IDEX2, EXME1), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD) , I$(icache), D$(dcache)
     {
-        I$ = ICache(icache);
-        D$ = DCache(dcache);
+        pc.write(0);
         halt = false;
     }
     void run();

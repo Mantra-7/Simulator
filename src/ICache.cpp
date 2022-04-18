@@ -6,8 +6,7 @@ int16 ICache::request(int8 addr)
     int offset = addr & 3;
     int16 little = m_data[set].m_offset[offset];
     int16 big = m_data[set].m_offset[offset + 1];
-
-    return little<<8 + big;
+    return (little<<8) + big;
 }
 
 void ICache::write(int8 addr, int16 val)
@@ -21,10 +20,11 @@ void ICache::write(int8 addr, int16 val)
 ICache::ICache(ifstream &fin)
 {
     int8 addr = 0;
-    int input;
-    while(fin>>input)
+    int16 input;
+
+    while(fin>>hex>>input)
     {
         this->write(addr, input);
-        addr += 4;
+        addr += 2;
     }
 }
