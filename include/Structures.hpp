@@ -9,8 +9,8 @@ using namespace std;
 #define NUM_SETS 64
 #define NUM_REGS 16
 
-typedef int int8;
-typedef int int16;
+typedef unsigned char int8;
+typedef unsigned short int16;
 typedef bool flag;
 
 class Register
