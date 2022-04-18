@@ -1,13 +1,11 @@
 SRC_DIR := src
-OBJ_DIR := obj
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+INC_DIR := include
+BIN_DIR := bin
+OUT := simm
 
-Simulator: $(OBJ_FILES)
-	g++ -o $@ $^
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp include/Structures.hpp
-	g++ -c $< -o $@ 
+simm: $(INC_DIR)/Structures.hpp
+	g++ $(SRC_FILES) -o $(BIN_DIR)/$(OUT) 
 
 clean:
-	rm -f $(OBJ_FILES)
+	rm -f $(BIN_DIR)/$(OUT)
