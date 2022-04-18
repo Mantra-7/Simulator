@@ -433,7 +433,7 @@ void processINC(string line)
         return;
     }
 
-    inst+="xx";
+    inst+="00";
     res<<inst<<endl;
 }
 
@@ -855,7 +855,7 @@ void processNOT(string line)
         invalid = true;
         return;
     }
-    inst+="x";
+    inst+="0";
     res<<inst<<endl;
 }
 
@@ -1108,7 +1108,7 @@ void processJMP(string line)
         invalid = true;
         return;
     }
-    inst+="x";
+    inst+="0";
     res<<inst<<endl;
 }
 
@@ -1215,7 +1215,7 @@ void processHLT(string line)
             return;
         }
     }
-    inst+="xxx";
+    inst+="000";
     res<<inst<<endl;
 }
 

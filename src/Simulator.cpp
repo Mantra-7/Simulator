@@ -7,7 +7,7 @@ int main()
 
     Processor processor(icache, dcache);
     
-    for(int i = 0; i < 30; i+=2)
+    for(int i = 0; i < 16; i+=2)
     {
         processor.run();
     }
