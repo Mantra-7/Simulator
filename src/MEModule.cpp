@@ -15,6 +15,7 @@ void MEModule::run()
     mewbbuf.dest = exmebuf.dest;
     mewbbuf.valid = true;
     stall = false;
+    mewbbuf.load = false;
 
     if(exmebuf.load)
     {

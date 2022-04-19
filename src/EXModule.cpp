@@ -11,6 +11,10 @@ void EXModule::run()
     
     stall = false;
     exmebuf.valid = true;
+    exmebuf.load = false;
+    exmebuf.store = false;
+    exmebuf.halt = false;
+    exmebuf.writeToRegister = false;
 
     if(idexbuf.arithmatic)
     {

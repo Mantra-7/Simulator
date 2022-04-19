@@ -2,14 +2,7 @@
 
 void IDRFModule::run()
 {
-    if(!branch_resolved)
-    {
-        stall = true;
-        idexbuf.valid = false;
-        return;
-    }
-
-    if(!ifidbuf.valid)
+    if(!ifidbuf.valid || !branch_resolved)
     {
         stall = true;
         idexbuf.valid = false;
@@ -25,7 +18,7 @@ void IDRFModule::run()
     idexbuf.halt = false;
     idexbuf.valid = true;
 
-    int16 instruction = ifidbuf.getInstruction();
+    int16 instruction = ifidbuf.instruction;
     cout << "IDRFModule: " << hex << instruction << endl;
     int16 opcode = instruction >> 12;
     idexbuf.opcode = opcode;
@@ -67,7 +60,7 @@ void IDRFModule::run()
         int8 r2 = (instruction & 0x00f0)>>4;
         int8 x = (instruction & 0x000f);
 
-        idexbuf.src1 = RF.read(r1);
+        idexbuf.src1 = r1;
         idexbuf.src2 = RF.read(r2);
         idexbuf.offset = x;
         return;
