@@ -17,6 +17,7 @@ class Register
 {
     int8 m_val;
 public:
+    flag valid;
     int8 read();
     void write(int8 val); 
 };
@@ -81,13 +82,10 @@ public:
 };
 
 class IFIDBuffer{
-    int16 instruction;
 public:
+    int16 instruction;
     flag valid;
     IFIDBuffer() : valid(false), instruction(0xf000) {}
-    int16 getInstruction();
-    void set(int16 instruction);
-    void invalidate();
 };
 
 class IFModule{
@@ -181,10 +179,8 @@ public:
     flag store;
     flag writeToReg;
     flag halt;
-    //flag alu_inst;
     int alu_result;
     int8 dest;
-    int valToWrite;
 };
 
 class MEModule{

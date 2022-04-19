@@ -2,7 +2,7 @@ cd Assembler/
 ./msasm input output
 cd ../input/
 g++ generate.cpp -o generate
-./generate
+./generate ../Assembler/output 0
 cd ../
 make clean
 make

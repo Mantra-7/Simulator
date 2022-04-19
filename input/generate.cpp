@@ -1,29 +1,51 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-int main()
+int main(int argc, char const *argv[])
 {
-    ofstream fdout("DCacheData.txt");
-    ifstream fin("../Assembler/output");
-    ofstream fiout("ICacheData.txt");
+    if(argc!=3)
+    {
+        cout<<"Usage: ./generate <icache_input> <dcache_input>"<<endl;
+        cout<<"put 0 if you want 0 in all"<<endl;
+        return 0;
+    }
+    ifstream icache_input(argv[1]);
+    ifstream dcache_input(argv[2]);
+    ofstream icache("../input/ICacheData.txt");
+    ofstream dcache("../input/DCacheData.txt");
     
-    for(int i=0;i<256;i++)
+    if(icache_input.is_open())
     {
-        fdout<<"00\n";
+        string s;
+        int c=0;
+        while(getline(icache_input,s))
+        {
+            c++;
+            icache<<s<<"\n";
+        }
+
+        while(c<128)
+        {
+            icache<<"0000\n";
+            c++;
+        }
     }
 
-    string s;
-    int c=0;
-    while(getline(fin,s))
+    if(dcache_input.is_open())
     {
-        c++;
-        fiout<<s<<"\n";
-    }
-
-    while(c<128)
-    {
-        fiout<<"0000\n";
-        c++;
+        string s;
+        int c=0;
+        while(getline(dcache_input,s))
+        {
+            c++;
+            dcache<<s<<"\n";
+        }
+        
+        while(c<256)
+        {
+            dcache<<"0000\n";
+            c++;
+        }
     }
 
 }
