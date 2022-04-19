@@ -2,7 +2,7 @@
 
 void IDRFModule::run()
 {
-    if(!ifidbuf.valid || !branch_resolved)
+    if(!ifidbuf.valid || !branch_resolved || dataHaz)
     {
         stall = true;
         idexbuf.valid = false;
@@ -31,11 +31,22 @@ void IDRFModule::run()
         int8 r1 = (instruction & 0x00f0)>>4;
         int8 r2 = (instruction & 0x000f);
 
-        idexbuf.src1 = RF.read(r1);
-        idexbuf.src2 = RF.read(r2);
-        idexbuf.dest = r3;
-        idexbuf.subop = opcode & 0x03;
-        return;
+        if(RF.R[r1].valid && RF.R[r2].valid)
+        {
+            idexbuf.src1 = RF.read(r1);
+            idexbuf.src2 = RF.read(r2);
+            idexbuf.dest = r3;
+            RF.R[r3].valid = false;
+            idexbuf.subop = opcode & 0x03;
+            return;
+        }
+        else
+        {
+            stall = true;
+            idexbuf.valid = false;
+            dataHaz = true;
+            return;
+        }
     }
 
     if(opcode<8)
@@ -46,11 +57,21 @@ void IDRFModule::run()
         int8 r1 = (instruction & 0x00f0)>>4;
         int8 r2 = (instruction & 0x000f);
 
-        idexbuf.src1 = RF.read(r1);
-        idexbuf.src2 = RF.read(r2);
-        idexbuf.dest = r3;
-        idexbuf.subop = opcode & 0x03;
-        return;
+        if(RF.R[r1].valid && RF.R[r2].valid)
+        {
+            idexbuf.src1 = RF.read(r1);
+            idexbuf.src2 = RF.read(r2);
+            idexbuf.dest = r3;
+            idexbuf.subop = opcode & 0x03;
+            return;
+        }
+        else
+        {
+            stall = true;
+            idexbuf.valid = false;
+            dataHaz = true;
+            return;
+        }
     }
 
     if(opcode == 8)
@@ -59,11 +80,21 @@ void IDRFModule::run()
         int8 r1 = (instruction & 0x0f00)>>8;
         int8 r2 = (instruction & 0x00f0)>>4;
         int8 x = (instruction & 0x000f);
-
-        idexbuf.src1 = r1;
-        idexbuf.src2 = RF.read(r2);
-        idexbuf.offset = x;
-        return;
+        if(RF.R[r1].valid && RF.R[r2].valid)
+        {
+            idexbuf.src1 = r1;
+            idexbuf.src2 = RF.read(r2);
+            idexbuf.offset = x;
+            return;
+        }
+        else
+        {
+            stall = true;
+            idexbuf.valid = false;
+            dataHaz = true;
+            return;
+        }
+        
     }
 
     if(opcode == 9)
@@ -72,7 +103,6 @@ void IDRFModule::run()
         int8 r1 = (instruction & 0x0f00)>>8;
         int8 r2 = (instruction & 0x00f0)>>4;
         int8 x = (instruction & 0x000f);
-
         idexbuf.src1 = RF.read(r1);
         idexbuf.src2 = RF.read(r2);
         idexbuf.offset = x;

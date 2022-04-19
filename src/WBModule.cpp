@@ -12,12 +12,22 @@ void WBModule::run()
     stall = false;
     if(mewbbuf.load)
     {
+        if(RF.R[mewbbuf.dest].valid == false)
+        {
+            RF.R[mewbbuf.dest].valid = true;
+            dataHaz = false;
+        }
         cout<<"WB: writing from load at "<<(int)mewbbuf.dest<<" val is "<<(int)LMD.read()<<endl;
         RF.write(mewbbuf.dest, LMD.read());
     }
     
     if(mewbbuf.writeToReg)
     {
+        if(RF.R[mewbbuf.dest].valid == false)
+        {
+            RF.R[mewbbuf.dest].valid = true;
+            dataHaz = false;
+        }
         cout<<"WB: Writing from alu at "<<(int)mewbbuf.dest<<" val is "<<mewbbuf.alu_result<<endl;
         RF.write(mewbbuf.dest, mewbbuf.alu_result);
     }

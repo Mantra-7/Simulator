@@ -2,12 +2,15 @@
 
 void IFModule::run() 
 {
-    if(stall || !branch_resolved)
+    if(!branch_resolved || dataHaz || prevDataHaz)
     {
+        prevDataHaz = dataHaz;
         ifidbuf.valid = false;
+        stall = true;
         return;
     }
     
+    stall = false;
     ifidbuf.valid = true;
     int16 instruction = I$.request(pc.read());
     cout << "IFModule: " << hex << instruction << endl;

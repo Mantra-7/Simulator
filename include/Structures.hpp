@@ -31,8 +31,8 @@ public:
 };
 
 class RegisterFile{
-    Register R[NUM_REGS];
 public:
+    Register R[NUM_REGS];
     int8 read(int Pos);
     void write(int Pos, int8 val);
     RegisterFile();
@@ -96,10 +96,13 @@ public:
     IFIDBuffer &ifidbuf;
     flag stall;
     flag &branch_resolved;
+    flag &dataHaz;
+    flag prevDataHaz;
     IFModule();
-    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf, flag &branch_resolved) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf) , branch_resolved(branch_resolved) 
+    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf, flag &branch_resolved, flag &dataHaz) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) 
     {
         stall = false;
+        prevDataHaz = false;
     }
     void run();
 };
@@ -128,7 +131,7 @@ public:
 class IDRFModule{
 public:
     IDRFModule();
-    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT, flag &branch_resolved) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT) , branch_resolved(branch_resolved) 
+    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT, flag &branch_resolved, flag &dataHaz) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT) , branch_resolved(branch_resolved) , dataHaz(dataHaz) 
     {
         stall = false;
     }
@@ -139,6 +142,7 @@ public:
     flag &halt;
     flag stall;
     flag &branch_resolved;
+    flag &dataHaz;
     void run();
 };
 
@@ -199,8 +203,9 @@ class WBModule{
 public:
     flag valid;
     flag stall;
+    flag dataHaz;
     WBModule();
-    WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) {}
+    WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd, flag &dataHaz) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) , dataHaz(dataHaz) {}
     RegisterFile &RF;
     MEWBBuffer &mewbbuf;
     Register &LMD;
@@ -234,12 +239,14 @@ public:
     ALU alu;
     flag halt;
     flag branch_resolved;
+    flag dataHaz;
 
-    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved) , IDRF(rf, D$, IFID2, IDEX1, halt, branch_resolved), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD) , I$(icache), D$(dcache)
+    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz) , IDRF(rf, D$, IFID2, IDEX1, halt, branch_resolved, dataHaz), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz) , I$(icache), D$(dcache)
     {
         pc.write(0);
         halt = false;
         branch_resolved = true;
+        dataHaz = false;
     }
     void run();
 };
