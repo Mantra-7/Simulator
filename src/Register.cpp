@@ -25,6 +25,7 @@ RegisterFile::RegisterFile()
     for(int i = 0; i < NUM_REGS; i++)
     {
         R[i].write(0);
+        R[i].valid = true;
     }
 }
 

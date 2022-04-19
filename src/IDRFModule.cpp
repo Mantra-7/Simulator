@@ -80,7 +80,7 @@ void IDRFModule::run()
         int8 r1 = (instruction & 0x0f00)>>8;
         int8 r2 = (instruction & 0x00f0)>>4;
         int8 x = (instruction & 0x000f);
-        if(RF.R[r1].valid && RF.R[r2].valid)
+        if(RF.R[r2].valid)
         {
             idexbuf.src1 = r1;
             idexbuf.src2 = RF.read(r2);

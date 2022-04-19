@@ -8,7 +8,7 @@ void Processor::run()
     MEM.run();
     WB.run();
 
-    IFID2 = IFID1;
+    if(!dataHaz && !prevDataHaz) IFID2 = IFID1;
     IDEX2 = IDEX1;
     EXME2 = EXME1;
     MEWB2 = MEWB1;
