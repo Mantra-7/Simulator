@@ -1,3 +1,9 @@
+cd Assembler/
+./msasm input output
+cd ../input/
+g++ generate.cpp -o generate
+./generate
+cd ../
 make clean
 make
 bin/simm
