@@ -8,21 +8,20 @@ int control = 0;
 int halt = 0;
 int stall = -4;
 int datastall = 0;
-int controlstall = 0;
 int cc=1;
 
-void update_stats(Processor pc)
+void update_stats(Processor pc, IDEXBuffer idex)
 {
     if(!pc.EX.stall) 
     {
         instructions++;
-        if(pc.EX.idexbuf.arithmatic) arith++;
-        if(pc.EX.idexbuf.logical) logic++;
-        if(pc.EX.exmebuf.load)  dataa++;
-        if(pc.EX.exmebuf.store) dataa++;
-        if(pc.EX.idexbuf.jump) control++;
-        if(pc.EX.idexbuf.beqz) control++;
-        if(pc.EX.exmebuf.halt) halt++;
+        if(idex.arithmatic) arith++;
+        if(idex.logical) logic++;
+        if(idex.load)  dataa++;
+        if(idex.store) dataa++;
+        if(idex.jump) control++;
+        if(idex.beqz) control++;
+        if(idex.halt) halt++;
     }
     else 
     {
@@ -49,7 +48,7 @@ void print_stats(ofstream &fout)
     fout<<dec<<"Cycles Per Instruction               : "<<(float)(cc-1)/instructions<<endl;
     fout<<dec<<"Total number of stalls               : "<<stall<<endl;
     fout<<dec<<"Data stalls (RAW)                    : "<<datastall<<endl;
-    fout<<dec<<"Control stalls                       : "<<controlstall<<endl;
+    fout<<dec<<"Control stalls                       : "<<stall-datastall<<endl;
 }
 
 int main()
@@ -65,9 +64,11 @@ int main()
 
     while(!processor.halt)
     {
+        IDEXBuffer id = processor.EX.idexbuf;
+        cc++;
         //cout<<cc++<<endl<<"-------------------------------------------"<<endl;
         processor.run();
-        update_stats(processor);
+        update_stats(processor, id);
         //cout<<"-------------------------------------------"<<endl;
     }
 
