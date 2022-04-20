@@ -1,5 +1,13 @@
 #include "../include/Structures.hpp"
 
+int sign_Extension8(int x)
+{
+    if(x>127)
+        return x-256;
+    else
+        return x;
+}
+
 void EXModule::run()
 {
     if(!idexbuf.valid)
@@ -86,7 +94,7 @@ void EXModule::run()
     {
         cout<<"EX: Jump"<<endl;
         exmebuf.jump = true;
-        exmebuf.alu_result = alu.adder(pc.read(),idexbuf.jump_addr << 1,false);
+        exmebuf.alu_result = alu.adder(pc.read(),sign_Extension8(idexbuf.jump_addr << 1),false);
         pc.write(exmebuf.alu_result);
         idexbuf.valid = false;
         stall = true;
@@ -94,10 +102,10 @@ void EXModule::run()
         return;
     }
 
-    if(idexbuf.bneq)
+    if(idexbuf.beqz)
     {
-        cout<<"EX: BNEQ"<<endl;
-        exmebuf.alu_result = alu.BNEQ(idexbuf.src1);
+        cout<<"EX: BEQZ"<<endl;
+        exmebuf.alu_result = alu.BEQZ(idexbuf.src1);
         if(exmebuf.alu_result)
         {
             exmebuf.alu_result = alu.adder(pc.read(),idexbuf.jump_addr << 1,false);

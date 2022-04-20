@@ -13,7 +13,7 @@ void IDRFModule::run()
     idexbuf.logical = false;
     idexbuf.load = false;
     idexbuf.store = false;
-    idexbuf.bneq = false;
+    idexbuf.beqz = false;
     idexbuf.jump = false;
     idexbuf.halt = false;
     idexbuf.valid = true;
@@ -35,6 +35,7 @@ void IDRFModule::run()
         {
             idexbuf.src1 = RF.read(r1);
             idexbuf.src2 = RF.read(r2);
+            if(opcode == 3) idexbuf.src1 = RF.read(r3);
             idexbuf.dest = r3;
             RF.R[r3].valid = false;
             idexbuf.subop = opcode & 0x03;
@@ -118,7 +119,7 @@ void IDRFModule::run()
     if(opcode == 11)
     {
         branch_resolved = false;
-        idexbuf.bneq = true;
+        idexbuf.beqz = true;
         int8 r1 = (instruction & 0x0f00)>>8;
         idexbuf.src1 = RF.read(r1);
         idexbuf.jump_addr = instruction & 0x00ff;

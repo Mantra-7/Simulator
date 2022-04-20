@@ -14,3 +14,8 @@ void PC::increment()
 {
     m_addr+=2;
 }
+
+void PC::decrement()
+{
+    m_addr-=2;
+}

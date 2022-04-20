@@ -9,8 +9,8 @@ using namespace std;
 #define NUM_SETS 64
 #define NUM_REGS 16
 
-typedef unsigned char int8;
-typedef unsigned short int16;
+typedef int int8;
+typedef int int16;
 typedef bool flag;
 
 class Register
@@ -67,6 +67,7 @@ public:
     int8 read();
     void write(int8 addr);
     void increment();
+    void decrement();
 };
 
 class ALU
@@ -78,7 +79,7 @@ public:
     int8 OR(int8 X, int8 Y);
     int8 NOT(int8 X);
     int8 XOR(int8 X, int8 Y);
-    flag BNEQ(int X);
+    flag BEQZ(int X);
 };
 
 class IFIDBuffer{
@@ -117,7 +118,7 @@ public:
     flag logical;
     flag load;
     flag store;
-    flag bneq;
+    flag beqz;
     flag jump;
     flag halt;
 
@@ -240,6 +241,7 @@ public:
 
     ALU alu;
     flag halt;
+    flag prevBranchRes;
     flag branch_resolved;
     flag dataHaz;
     flag prevDataHaz;
@@ -253,11 +255,13 @@ public:
         MEWB2.valid = false;
         pc.write(0);
         halt = false;
+        prevBranchRes = true;
         branch_resolved = true;
         dataHaz = false;
         prevDataHaz = false;
     }
     void run();
+    void flushIFID();
 };
 
 #endif

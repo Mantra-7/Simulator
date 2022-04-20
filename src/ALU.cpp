@@ -37,7 +37,7 @@ int8 ALU::XOR(int8 X, int8 Y)
     return X ^ Y;
 }
 
-flag ALU::BNEQ(int X)
+flag ALU::BEQZ(int X)
 {
     return X == 0;
 }
