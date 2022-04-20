@@ -2,7 +2,7 @@ cd Assembler/
 ./msasm input output
 cd ../input/
 g++ generate.cpp -o generate
-./generate ../Assembler/output 0
+./generate ../Assembler/output DCacheInput.txt rfInput.txt
 cd ../
 make clean
 make

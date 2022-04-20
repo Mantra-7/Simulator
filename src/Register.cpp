@@ -20,11 +20,13 @@ void Register16::write(int16 val)
     m_val = val;
 }
 
-RegisterFile::RegisterFile()
+RegisterFile::RegisterFile(ifstream &rf)
 {
     for(int i = 0; i < NUM_REGS; i++)
     {
-        R[i].write(0);
+        int input;
+        rf >> hex >> input;
+        R[i].write(input);
         R[i].valid = true;
     }
 }

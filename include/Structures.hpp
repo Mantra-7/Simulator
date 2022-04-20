@@ -35,7 +35,7 @@ public:
     Register R[NUM_REGS];
     int8 read(int Pos);
     void write(int Pos, int8 val);
-    RegisterFile();
+    RegisterFile(ifstream &rf);
 };
 
 typedef struct Block{
@@ -245,7 +245,7 @@ public:
     flag prevDataHaz;
     flag stop;
 
-    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz, stop) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz, stop), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz, halt) , I$(icache), D$(dcache)
+    Processor(ifstream &icache, ifstream &dcache, ifstream &rfIn) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz, stop) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz, stop), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz, halt) , I$(icache), D$(dcache) , rf(rfIn) 
     {
         IFID2.valid = false;
         IDEX2.valid = false;

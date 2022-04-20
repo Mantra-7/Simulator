@@ -3,16 +3,18 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    if(argc!=3)
+    if(argc!=4)
     {
-        cout<<"Usage: ./generate <icache_input> <dcache_input>"<<endl;
+        cout<<"Usage: ./generate <icache_input> <dcache_input> <register_input>"<<endl;
         cout<<"put 0 if you want 0 in all"<<endl;
         return 0;
     }
     ifstream icache_input(argv[1]);
     ifstream dcache_input(argv[2]);
+    ifstream rf_input(argv[3]);
     ofstream icache("../input/ICacheData.txt");
     ofstream dcache("../input/DCacheData.txt");
+    ofstream rf("../input/RFData.txt");
     
     if(icache_input.is_open())
     {
@@ -48,5 +50,20 @@ int main(int argc, char const *argv[])
         c++;
     }
     
+    c=0;
+    if(rf_input.is_open())
+    {
+        string s;
+        while(getline(rf_input,s))
+        {
+            c++;
+            rf<<s<<"\n";
+        }
+    }
+    while(c<16)
+    {
+        rf<<"00\n";
+        c++;
+    }
 
 }
