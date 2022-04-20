@@ -26,3 +26,14 @@ DCache::DCache(ifstream &fin)
         addr += 1;
     }
 }
+
+void DCache::output(ofstream &fout)
+{
+    for(int i = 0; i < NUM_SETS; i++)
+    {
+        for(int j = 0; j < BLOCK_SIZE; j++)
+        {
+            fout<<hex<<(int)m_data[i].m_offset[j]<<endl;
+        }
+    }
+}

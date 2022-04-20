@@ -40,3 +40,11 @@ void RegisterFile::write(int Pos, int8 val)
 {
     R[Pos].write(val);
 }
+
+void RegisterFile::output(ofstream &fout)
+{
+    for(int i = 0; i < NUM_REGS; i++)
+    {
+        fout << hex << R[i].read() << endl;
+    }
+}

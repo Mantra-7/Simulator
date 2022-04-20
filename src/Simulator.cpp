@@ -37,19 +37,19 @@ void update_stats(Processor pc)
     }
 }
 
-void print_stats()
+void print_stats(ofstream &fout)
 {
-    cout<<"Total number of instructions executed: "<<instructions<<endl;
-    cout<<"Number of instructions in each class"<<endl;
-    cout<<"Arithmetic instructions              : "<<arith<<endl;
-    cout<<"Logical instructions                 : "<<logic<<endl;
-    cout<<"Data instructions                    : "<<dataa<<endl;
-    cout<<"Control instructions                 : "<<control<<endl;
-    cout<<"Halt instructions                    : "<<halt<<endl;
-    cout<<"Cycles Per Instruction               : "<<(float)(cc-1)/instructions<<endl;
-    cout<<"Total number of stalls               : "<<stall<<endl;
-    cout<<"Data stalls (RAW)                    : "<<datastall<<endl;
-    cout<<"Control stalls                       : "<<controlstall<<endl;
+    fout<<"Total number of instructions executed: "<<instructions<<endl;
+    fout<<"Number of instructions in each class"<<endl;
+    fout<<"Arithmetic instructions              : "<<arith<<endl;
+    fout<<"Logical instructions                 : "<<logic<<endl;
+    fout<<"Data instructions                    : "<<dataa<<endl;
+    fout<<"Control instructions                 : "<<control<<endl;
+    fout<<"Halt instructions                    : "<<halt<<endl;
+    fout<<"Cycles Per Instruction               : "<<(float)(cc-1)/instructions<<endl;
+    fout<<"Total number of stalls               : "<<stall<<endl;
+    fout<<"Data stalls (RAW)                    : "<<datastall<<endl;
+    fout<<"Control stalls                       : "<<controlstall<<endl;
 }
 
 int main()
@@ -57,6 +57,9 @@ int main()
     ifstream icache("input/ICacheData.txt");
     ifstream dcache("input/DCacheData.txt");
     ifstream rf("input/RFData.txt");
+    ofstream dCacheOutput("output/ODCache.txt");
+    ofstream rfOutput("output/ORF.txt");
+    ofstream stats("output/Output.txt");
 
     Processor processor(icache, dcache, rf);
 
@@ -68,5 +71,7 @@ int main()
         cout<<"-------------------------------------------"<<endl;
     }
 
-    print_stats();
+    processor.D$.output(dCacheOutput);
+    processor.rf.output(rfOutput);
+    print_stats(stats);
 }

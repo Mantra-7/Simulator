@@ -36,6 +36,7 @@ public:
     Register R[NUM_REGS];
     int8 read(int Pos);
     void write(int Pos, int8 val);
+    void output(ofstream &fout);
     RegisterFile(ifstream &rf);
 };
 
@@ -57,6 +58,7 @@ class DCache{
 public:
     DCache(){}
     DCache(ifstream &fin);
+    void output(ofstream &fout);
     int8 request(int8 addr);
     void write(int8 addr, int8 val);
 };
@@ -261,6 +263,7 @@ public:
         dataHaz = false;
         prevDataHaz = false;
     }
+
     void run();
     void flushIFID();
 };
