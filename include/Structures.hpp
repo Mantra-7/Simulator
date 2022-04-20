@@ -131,7 +131,7 @@ public:
 class IDRFModule{
 public:
     IDRFModule();
-    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &HALT, flag &branch_resolved, flag &dataHaz) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , halt(HALT) , branch_resolved(branch_resolved) , dataHaz(dataHaz) 
+    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &branch_resolved, flag &dataHaz) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) 
     {
         stall = false;
     }
@@ -139,7 +139,6 @@ public:
     DCache &D$;
     IFIDBuffer &ifidbuf;
     IDEXBuffer &idexbuf;
-    flag &halt;
     flag stall;
     flag &branch_resolved;
     flag &dataHaz;
@@ -204,8 +203,9 @@ public:
     flag valid;
     flag stall;
     flag &dataHaz;
+    flag &halt;
     WBModule();
-    WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd, flag &dataHaz) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) , dataHaz(dataHaz) {}
+    WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd, flag &dataHaz, flag &halt) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) , dataHaz(dataHaz) , halt(halt) {}
     RegisterFile &RF;
     MEWBBuffer &mewbbuf;
     Register &LMD;
@@ -242,8 +242,12 @@ public:
     flag dataHaz;
     flag prevDataHaz;
 
-    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz) , IDRF(rf, D$, IFID2, IDEX1, halt, branch_resolved, dataHaz), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz) , I$(icache), D$(dcache)
+    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz, halt) , I$(icache), D$(dcache)
     {
+        IFID2.valid = false;
+        IDEX2.valid = false;
+        EXME2.valid = false;
+        MEWB2.valid = false;
         pc.write(0);
         halt = false;
         branch_resolved = true;
