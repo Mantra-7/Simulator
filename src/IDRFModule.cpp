@@ -2,7 +2,7 @@
 
 void IDRFModule::run()
 {
-    if(!ifidbuf.valid || !branch_resolved || dataHaz)
+    if(stop || !ifidbuf.valid || !branch_resolved || dataHaz)
     {
         stall = true;
         idexbuf.valid = false;
@@ -38,18 +38,18 @@ void IDRFModule::run()
             idexbuf.dest = r3;
             RF.R[r3].valid = false;
             idexbuf.subop = opcode & 0x03;
-            return;
+
         }
         else
         {
             stall = true;
             idexbuf.valid = false;
             dataHaz = true;
-            return;
+
         }
     }
 
-    if(opcode<8)
+    else if(opcode<8)
     {
         idexbuf.logical = true;
 
@@ -63,14 +63,14 @@ void IDRFModule::run()
             idexbuf.src2 = RF.read(r2);
             idexbuf.dest = r3;
             idexbuf.subop = opcode & 0x03;
-            return;
+
         }
         else
         {
             stall = true;
             idexbuf.valid = false;
             dataHaz = true;
-            return;
+
         }
     }
 
@@ -85,14 +85,14 @@ void IDRFModule::run()
             idexbuf.src1 = r1;
             idexbuf.src2 = RF.read(r2);
             idexbuf.offset = x;
-            return;
+
         }
         else
         {
             stall = true;
             idexbuf.valid = false;
             dataHaz = true;
-            return;
+
         }
         
     }
@@ -106,7 +106,6 @@ void IDRFModule::run()
         idexbuf.src1 = RF.read(r1);
         idexbuf.src2 = RF.read(r2);
         idexbuf.offset = x;
-        return;
     }
 
     if(opcode == 10)
@@ -114,7 +113,6 @@ void IDRFModule::run()
         branch_resolved = false;
         idexbuf.jump = true;
         idexbuf.jump_addr = (instruction & 0x0ff0)>>4;
-        return;
     }
 
     if(opcode == 11)
@@ -124,9 +122,11 @@ void IDRFModule::run()
         int8 r1 = (instruction & 0x0f00)>>8;
         idexbuf.src1 = RF.read(r1);
         idexbuf.jump_addr = instruction & 0x00ff;
-        return;
     }
 
-    idexbuf.halt = true;
-    halt = true;
+    if(opcode==15)
+    {
+        idexbuf.halt = true;
+        stop = true;
+    }
 }

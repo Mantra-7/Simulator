@@ -16,6 +16,7 @@ void MEModule::run()
     mewbbuf.valid = true;
     stall = false;
     mewbbuf.load = false;
+    mewbbuf.halt = exmebuf.halt;
 
     if(exmebuf.load)
     {
@@ -30,11 +31,5 @@ void MEModule::run()
         cout<<"MEM: Storing to address "<<exmebuf.alu_result<<endl;
         D$.write(exmebuf.alu_result, exmebuf.store_src);
         mewbbuf.store = true;
-    }
-
-    if(exmebuf.halt)
-    {
-        mewbbuf.halt = true;
-        return;
     }
 }

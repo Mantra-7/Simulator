@@ -2,7 +2,7 @@
 
 void IFModule::run() 
 {
-    if(!branch_resolved || dataHaz || prevDataHaz)
+    if(stop || !branch_resolved || dataHaz || prevDataHaz)
     {
         prevDataHaz = dataHaz;
         ifidbuf.valid = false;

@@ -2,10 +2,16 @@
 
 void WBModule::run()
 {
-    //cout<<"WBModule: "<<"load "<<mewbbuf.load<<" wtr "<<mewbbuf.writeToReg<<endl;
+    cout<<"WBModule: "<<"load "<<mewbbuf.load<<" wtr "<<mewbbuf.writeToReg<<endl;
     if(!mewbbuf.valid)
     {
         stall = true;
+        return;
+    }
+
+    if(mewbbuf.halt)
+    {
+        halt = true;
         return;
     }
     

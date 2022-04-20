@@ -13,7 +13,7 @@ void EXModule::run()
     exmebuf.valid = true;
     exmebuf.load = false;
     exmebuf.store = false;
-    exmebuf.halt = false;
+    exmebuf.halt = idexbuf.halt;
     exmebuf.writeToRegister = false;
 
     if(idexbuf.arithmatic)

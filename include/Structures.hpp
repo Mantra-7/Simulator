@@ -98,8 +98,9 @@ public:
     flag &branch_resolved;
     flag &dataHaz;
     flag &prevDataHaz;
+    flag &stop;
     IFModule();
-    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf, flag &branch_resolved, flag &dataHaz, flag &prevDataHaz) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) , prevDataHaz(prevDataHaz)
+    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf, flag &branch_resolved, flag &dataHaz, flag &prevDataHaz, flag &stop) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) , prevDataHaz(prevDataHaz) , stop(stop) 
     {
         stall = false;
         prevDataHaz = false;
@@ -131,7 +132,7 @@ public:
 class IDRFModule{
 public:
     IDRFModule();
-    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &branch_resolved, flag &dataHaz) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) 
+    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &branch_resolved, flag &dataHaz, flag &stop) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) , stop(stop)
     {
         stall = false;
     }
@@ -142,6 +143,7 @@ public:
     flag stall;
     flag &branch_resolved;
     flag &dataHaz;
+    flag &stop;
     void run();
 };
 
@@ -241,8 +243,9 @@ public:
     flag branch_resolved;
     flag dataHaz;
     flag prevDataHaz;
+    flag stop;
 
-    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz, halt) , I$(icache), D$(dcache)
+    Processor(ifstream &icache, ifstream &dcache) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz, stop) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz, stop), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz, halt) , I$(icache), D$(dcache)
     {
         IFID2.valid = false;
         IDEX2.valid = false;

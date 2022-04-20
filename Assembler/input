@@ -1,4 +1,4 @@
-JMP 1
+ADD R3, R3, R3
 ADD R1, R1, R1
 SUB R2, R2, R2
 HLT
