@@ -31,21 +31,21 @@ int main(int argc, char const *argv[])
         }
     }
 
+    int c=0;
     if(dcache_input.is_open())
     {
         string s;
-        int c=0;
         while(getline(dcache_input,s))
         {
             c++;
             dcache<<s<<"\n";
         }
-        
-        while(c<256)
-        {
-            dcache<<"0000\n";
-            c++;
-        }
     }
+    while(c<256)
+    {
+        dcache<<"00\n";
+        c++;
+    }
+    
 
 }
