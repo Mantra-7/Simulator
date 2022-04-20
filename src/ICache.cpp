@@ -26,7 +26,10 @@ ICache::ICache(ifstream &fin)
 
     while(fin>>hex>>input)
     {
-        this->write(addr, input);
+        int16 x = input;
+        fin>>hex>>input;
+        x = (x<<8) + input;
+        this->write(addr, x);
         addr += 2;
     }
 }

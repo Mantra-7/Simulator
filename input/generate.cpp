@@ -21,7 +21,8 @@ int main(int argc, char const *argv[])
         while(getline(icache_input,s))
         {
             c++;
-            icache<<s<<"\n";
+            icache<<s.substr(0,2)<<"\n";
+            icache<<s.substr(2,2)<<"\n";
         }
 
         while(c<128)
