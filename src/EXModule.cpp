@@ -33,7 +33,7 @@ void EXModule::run()
 
     if(idexbuf.arithmatic)
     {
-        cout<<"EX: Arithmatic"<<endl;
+        //cout<<"EX: Arithmatic"<<endl;
         exmebuf.writeToRegister = true;
         exmebuf.dest = idexbuf.dest;
         switch(idexbuf.subop)
@@ -57,7 +57,7 @@ void EXModule::run()
 
     if(idexbuf.logical)
     {
-        cout<<"EX: Logical"<<endl;
+        //cout<<"EX: Logical"<<endl;
         exmebuf.writeToRegister = true;
         exmebuf.dest = idexbuf.dest;
         switch(idexbuf.subop)
@@ -80,7 +80,7 @@ void EXModule::run()
         
     if(idexbuf.load)
     {
-        cout<<"EX: Load"<<endl;
+        //cout<<"EX: Load"<<endl;
         exmebuf.load = true;
         exmebuf.dest = idexbuf.src1;
         exmebuf.alu_result = alu.adder(idexbuf.src2,sign_Extension4(idexbuf.offset),false);
@@ -89,7 +89,7 @@ void EXModule::run()
 
     if(idexbuf.store)
     {
-        cout<<"EX: Store"<<endl;
+        //cout<<"EX: Store"<<endl;
         exmebuf.store = true;
         exmebuf.store_src = idexbuf.src1;
         exmebuf.alu_result = alu.adder(idexbuf.src2,sign_Extension4(idexbuf.offset),false);
@@ -99,7 +99,7 @@ void EXModule::run()
 
     if(idexbuf.jump)
     {
-        cout<<"EX: Jump"<<endl;
+        //cout<<"EX: Jump"<<endl;
         exmebuf.jump = true;
         exmebuf.alu_result = alu.adder(pc.read(),sign_Extension8(idexbuf.jump_addr << 1),false);
         pc.write(exmebuf.alu_result);
@@ -110,7 +110,7 @@ void EXModule::run()
 
     if(idexbuf.beqz)
     {
-        cout<<"EX: BEQZ"<<endl;
+        //cout<<"EX: BEQZ"<<endl;
         exmebuf.alu_result = alu.BEQZ(idexbuf.src1);
         if(exmebuf.alu_result)
         {

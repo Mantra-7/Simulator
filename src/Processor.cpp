@@ -6,7 +6,7 @@ void Processor::run()
     IDRF.run(1);
     if(prevBranchRes && !branch_resolved)
     {
-        cout<<"flush"<<endl;
+        //cout<<"flush"<<endl;
         flushIFID();
     }
     prevBranchRes = branch_resolved;
@@ -14,7 +14,7 @@ void Processor::run()
     MEM.run();
     int prevdh = dataHaz;
     WB.run();
-    cout<<"datahaz bef is "<<dataHaz<<endl;
+    //cout<<"datahaz bef is "<<dataHaz<<endl;
     if(prevdh && !dataHaz)
     {
         IDRF.run(0);

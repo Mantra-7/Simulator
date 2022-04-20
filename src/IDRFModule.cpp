@@ -19,7 +19,7 @@ void IDRFModule::run(int x)
     idexbuf.valid = true;
 
     int16 instruction = ifidbuf.instruction;
-    cout << "IDRFModule: " << hex << instruction << endl;
+    //cout << "IDRFModule: " << hex << instruction << endl;
     int16 opcode = instruction >> 12;
     idexbuf.opcode = opcode;
 
@@ -182,7 +182,7 @@ void IDRFModule::run(int x)
         int8 r1 = (instruction & 0x0f00)>>8;
         if(!RF.R[r1].valid)
         {
-            cout<<"huh"<<endl;
+            //cout<<"huh"<<endl;
             stall = true;
             idexbuf.valid = false;
             RF.R[r1].dh = true;

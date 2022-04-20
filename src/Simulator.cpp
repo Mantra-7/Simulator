@@ -26,37 +26,37 @@ void update_stats(Processor pc)
     }
     else 
     {
-        cout<<"stall here: "<<cc-1<<endl;
+        //cout<<"stall here: "<<cc-1<<endl;
         stall++;
     }
 
     if(pc.dataHaz) 
     {
-        cout<<"datahaz in "<<pc.dataHaz<<endl;
+        //cout<<"datahaz in "<<pc.dataHaz<<endl;
         datastall++;
     }
 }
 
 void print_stats(ofstream &fout)
 {
-    fout<<"Total number of instructions executed: "<<instructions<<endl;
-    fout<<"Number of instructions in each class"<<endl;
-    fout<<"Arithmetic instructions              : "<<arith<<endl;
-    fout<<"Logical instructions                 : "<<logic<<endl;
-    fout<<"Data instructions                    : "<<dataa<<endl;
-    fout<<"Control instructions                 : "<<control<<endl;
-    fout<<"Halt instructions                    : "<<halt<<endl;
-    fout<<"Cycles Per Instruction               : "<<(float)(cc-1)/instructions<<endl;
-    fout<<"Total number of stalls               : "<<stall<<endl;
-    fout<<"Data stalls (RAW)                    : "<<datastall<<endl;
-    fout<<"Control stalls                       : "<<controlstall<<endl;
+    fout<<dec<<"Total number of instructions executed: "<<instructions<<endl;
+    fout<<dec<<"Number of instructions in each class"<<endl;
+    fout<<dec<<"Arithmetic instructions              : "<<arith<<endl;
+    fout<<dec<<"Logical instructions                 : "<<logic<<endl;
+    fout<<dec<<"Data instructions                    : "<<dataa<<endl;
+    fout<<dec<<"Control instructions                 : "<<control<<endl;
+    fout<<dec<<"Halt instructions                    : "<<halt<<endl;
+    fout<<dec<<"Cycles Per Instruction               : "<<(float)(cc-1)/instructions<<endl;
+    fout<<dec<<"Total number of stalls               : "<<stall<<endl;
+    fout<<dec<<"Data stalls (RAW)                    : "<<datastall<<endl;
+    fout<<dec<<"Control stalls                       : "<<controlstall<<endl;
 }
 
 int main()
 {
-    ifstream icache("input/ICacheData.txt");
-    ifstream dcache("input/DCacheData.txt");
-    ifstream rf("input/RFData.txt");
+    ifstream icache("input/ICache.txt");
+    ifstream dcache("input/DCache.txt");
+    ifstream rf("input/RF.txt");
     ofstream dCacheOutput("output/ODCache.txt");
     ofstream rfOutput("output/ORF.txt");
     ofstream stats("output/Output.txt");
@@ -65,10 +65,10 @@ int main()
 
     while(!processor.halt)
     {
-        cout<<cc++<<endl<<"-------------------------------------------"<<endl;
+        //cout<<cc++<<endl<<"-------------------------------------------"<<endl;
         processor.run();
         update_stats(processor);
-        cout<<"-------------------------------------------"<<endl;
+        //cout<<"-------------------------------------------"<<endl;
     }
 
     processor.D$.output(dCacheOutput);

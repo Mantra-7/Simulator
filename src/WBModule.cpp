@@ -27,7 +27,7 @@ void WBModule::run()
             }
             
         }
-        cout<<"WB: writing from load at "<<(int)mewbbuf.dest<<" val is "<<(int)LMD.read()<<endl;
+        //cout<<"WB: writing from load at "<<(int)mewbbuf.dest<<" val is "<<(int)LMD.read()<<endl;
         RF.write(mewbbuf.dest, LMD.read());
     }
     
@@ -42,7 +42,7 @@ void WBModule::run()
                 dataHaz--;
             }
         }
-        cout<<"WB: Writing from alu at "<<(int)mewbbuf.dest<<" val is "<<mewbbuf.alu_result<<endl;
+        //cout<<"WB: Writing from alu at "<<(int)mewbbuf.dest<<" val is "<<mewbbuf.alu_result<<endl;
         RF.write(mewbbuf.dest, mewbbuf.alu_result);
     }
 }
