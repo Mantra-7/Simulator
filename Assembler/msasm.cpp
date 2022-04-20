@@ -670,7 +670,7 @@ void processXOR(string line)
     ss>>opcode;
     
     string inst;
-    inst+='6';
+    inst+='7';
 
     string r;
     if(getline(ss,r,','))
@@ -783,7 +783,7 @@ void processNOT(string line)
     ss>>opcode;
     
     string inst;
-    inst+='7';
+    inst+='6';
 
     string r;
     if(getline(ss,r,','))

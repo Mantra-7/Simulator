@@ -8,6 +8,13 @@ int sign_Extension8(int x)
         return x;
 }
 
+int sign_Extension4(int x)
+{
+    if(x>7)
+        return x-16;
+    else return x;
+}
+
 void EXModule::run()
 {
     if(!idexbuf.valid)
@@ -76,7 +83,7 @@ void EXModule::run()
         cout<<"EX: Load"<<endl;
         exmebuf.load = true;
         exmebuf.dest = idexbuf.src1;
-        exmebuf.alu_result = alu.adder(idexbuf.src2,idexbuf.offset,false);
+        exmebuf.alu_result = alu.adder(idexbuf.src2,sign_Extension4(idexbuf.offset),false);
         return;
     }
 
@@ -85,7 +92,7 @@ void EXModule::run()
         cout<<"EX: Store"<<endl;
         exmebuf.store = true;
         exmebuf.store_src = idexbuf.src1;
-        exmebuf.alu_result = alu.adder(idexbuf.src2,idexbuf.offset,false);
+        exmebuf.alu_result = alu.adder(idexbuf.src2,sign_Extension4(idexbuf.offset),false);
         exmebuf.dest = exmebuf.alu_result;
         return;
     }
@@ -96,7 +103,6 @@ void EXModule::run()
         exmebuf.jump = true;
         exmebuf.alu_result = alu.adder(pc.read(),sign_Extension8(idexbuf.jump_addr << 1),false);
         pc.write(exmebuf.alu_result);
-        idexbuf.valid = false;
         stall = true;
         branch_resolved = true;
         return;
@@ -108,7 +114,7 @@ void EXModule::run()
         exmebuf.alu_result = alu.BEQZ(idexbuf.src1);
         if(exmebuf.alu_result)
         {
-            exmebuf.alu_result = alu.adder(pc.read(),idexbuf.jump_addr << 1,false);
+            exmebuf.alu_result = alu.adder(pc.read(),sign_Extension8(idexbuf.jump_addr << 1),false);
             pc.write(exmebuf.alu_result);
             idexbuf.valid = false;
             stall = true;

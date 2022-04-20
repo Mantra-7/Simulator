@@ -22,14 +22,14 @@ int main(int argc, char const *argv[])
         int c=0;
         while(getline(icache_input,s))
         {
-            c++;
+            c+=2;
             icache<<s.substr(0,2)<<"\n";
             icache<<s.substr(2,2)<<"\n";
         }
 
-        while(c<128)
+        while(c<256)
         {
-            icache<<"0000\n";
+            icache<<"00\n";
             c++;
         }
     }

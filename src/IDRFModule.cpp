@@ -1,8 +1,8 @@
 #include "../include/Structures.hpp"
 
-void IDRFModule::run()
+void IDRFModule::run(int x)
 {
-    if(stop || !ifidbuf.valid || !branch_resolved || dataHaz)
+    if((stop || !ifidbuf.valid || !branch_resolved || dataHaz) && x)
     {
         stall = true;
         idexbuf.valid = false;
@@ -30,23 +30,46 @@ void IDRFModule::run()
         int8 r3 = (instruction & 0x0f00)>>8;
         int8 r1 = (instruction & 0x00f0)>>4;
         int8 r2 = (instruction & 0x000f);
-
-        if(RF.R[r1].valid && RF.R[r2].valid)
+        if(opcode == 3) 
+        {
+            if(RF.R[r3].valid)
+            {
+                
+                idexbuf.src1 = RF.read(r3);
+                idexbuf.dest = r3;
+                RF.R[r3].valid = false;
+                idexbuf.subop = opcode & 0x03;
+            }
+            else
+            {
+                stall = true;
+                idexbuf.valid = false;
+                dataHaz++;
+                RF.R[r3].dh = true;
+            }
+        }
+        else if(RF.R[r1].valid && RF.R[r2].valid)
         {
             idexbuf.src1 = RF.read(r1);
             idexbuf.src2 = RF.read(r2);
-            if(opcode == 3) idexbuf.src1 = RF.read(r3);
             idexbuf.dest = r3;
             RF.R[r3].valid = false;
             idexbuf.subop = opcode & 0x03;
-
         }
         else
         {
             stall = true;
             idexbuf.valid = false;
-            dataHaz = true;
-
+            if(!RF.R[r1].valid)  
+            {
+                RF.R[r1].dh=true;
+                dataHaz++;
+            }
+            if(!RF.R[r2].valid && r1!=r2) 
+            {
+                RF.R[r2].dh=true;
+                dataHaz++;
+            }
         }
     }
 
@@ -58,20 +81,44 @@ void IDRFModule::run()
         int8 r1 = (instruction & 0x00f0)>>4;
         int8 r2 = (instruction & 0x000f);
 
-        if(RF.R[r1].valid && RF.R[r2].valid)
+        if(opcode==6)
+        {
+            if(RF.R[r1].valid)
+            {
+                idexbuf.src1 = RF.read(r1);
+                idexbuf.dest = r3;
+                idexbuf.subop = opcode & 0x03;
+            }
+            else
+            {
+                stall = true;
+                idexbuf.valid = false;
+                RF.R[r1].dh=true;
+                dataHaz++;
+            }
+        }
+        else if(RF.R[r1].valid && RF.R[r2].valid)
         {
             idexbuf.src1 = RF.read(r1);
             idexbuf.src2 = RF.read(r2);
             idexbuf.dest = r3;
+            RF.R[r3].valid = false;
             idexbuf.subop = opcode & 0x03;
-
         }
         else
         {
             stall = true;
             idexbuf.valid = false;
-            dataHaz = true;
-
+            if(!RF.R[r1].valid)  
+            {
+                RF.R[r1].dh=true;
+                dataHaz++;
+            }
+            if(!RF.R[r2].valid && r1!=r2) 
+            {
+                RF.R[r2].dh=true;
+                dataHaz++;
+            }
         }
     }
 
@@ -86,16 +133,15 @@ void IDRFModule::run()
             idexbuf.src1 = r1;
             idexbuf.src2 = RF.read(r2);
             idexbuf.offset = x;
-
+            RF.R[r1].valid = false;
         }
         else
         {
             stall = true;
             idexbuf.valid = false;
-            dataHaz = true;
-
-        }
-        
+            RF.R[r2].dh = true;
+            dataHaz++;
+        }   
     }
 
     if(opcode == 9)
@@ -107,6 +153,19 @@ void IDRFModule::run()
         idexbuf.src1 = RF.read(r1);
         idexbuf.src2 = RF.read(r2);
         idexbuf.offset = x;
+        if(RF.R[r1].valid)
+        {
+            idexbuf.src1 = r1;
+            idexbuf.src2 = RF.read(r2);
+            idexbuf.offset = x;
+        }
+        else
+        {
+            stall = true;
+            idexbuf.valid = false;
+            RF.R[r1].dh = true;
+            dataHaz++;
+        } 
     }
 
     if(opcode == 10)
@@ -121,6 +180,14 @@ void IDRFModule::run()
         branch_resolved = false;
         idexbuf.beqz = true;
         int8 r1 = (instruction & 0x0f00)>>8;
+        if(!RF.R[r1].valid)
+        {
+            cout<<"huh"<<endl;
+            stall = true;
+            idexbuf.valid = false;
+            RF.R[r1].dh = true;
+            dataHaz++;
+        }
         idexbuf.src1 = RF.read(r1);
         idexbuf.jump_addr = instruction & 0x00ff;
     }

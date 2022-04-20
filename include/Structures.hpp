@@ -17,7 +17,8 @@ class Register
 {
     int8 m_val;
 public:
-    flag valid;
+    flag valid=true;
+    flag dh=false;
     int8 read();
     void write(int8 val); 
 };
@@ -97,11 +98,11 @@ public:
     IFIDBuffer &ifidbuf;
     flag stall;
     flag &branch_resolved;
-    flag &dataHaz;
-    flag &prevDataHaz;
+    int &dataHaz;
+    int &prevDataHaz;
     flag &stop;
     IFModule();
-    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf, flag &branch_resolved, flag &dataHaz, flag &prevDataHaz, flag &stop) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) , prevDataHaz(prevDataHaz) , stop(stop) 
+    IFModule(PC &pc, ICache &icache, Register16 &ir, IFIDBuffer &ifidbuf, flag &branch_resolved, int &dataHaz, int &prevDataHaz, flag &stop) : pc(pc), I$(icache), IR(ir) , ifidbuf(ifidbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) , prevDataHaz(prevDataHaz) , stop(stop) 
     {
         stall = false;
         prevDataHaz = false;
@@ -133,7 +134,7 @@ public:
 class IDRFModule{
 public:
     IDRFModule();
-    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &branch_resolved, flag &dataHaz, flag &stop) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) , stop(stop)
+    IDRFModule(RegisterFile &rf, DCache &D$, IFIDBuffer &ifidbuf, IDEXBuffer &idexbuf, flag &branch_resolved, int &dataHaz, flag &stop) : RF(rf), D$(D$) , ifidbuf(ifidbuf) , idexbuf(idexbuf) , branch_resolved(branch_resolved) , dataHaz(dataHaz) , stop(stop)
     {
         stall = false;
     }
@@ -143,9 +144,9 @@ public:
     IDEXBuffer &idexbuf;
     flag stall;
     flag &branch_resolved;
-    flag &dataHaz;
+    int &dataHaz;
     flag &stop;
-    void run();
+    void run(int x);
 };
 
 class EXMEBuffer{
@@ -205,10 +206,10 @@ class WBModule{
 public:
     flag valid;
     flag stall;
-    flag &dataHaz;
+    int &dataHaz;
     flag &halt;
     WBModule();
-    WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd, flag &dataHaz, flag &halt) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) , dataHaz(dataHaz) , halt(halt) {}
+    WBModule(RegisterFile &rf, MEWBBuffer &mewbbuf, Register &lmd, int &dataHaz, flag &halt) : RF(rf), mewbbuf(mewbbuf) , LMD(lmd) , dataHaz(dataHaz) , halt(halt) {}
     RegisterFile &RF;
     MEWBBuffer &mewbbuf;
     Register &LMD;
@@ -243,8 +244,8 @@ public:
     flag halt;
     flag prevBranchRes;
     flag branch_resolved;
-    flag dataHaz;
-    flag prevDataHaz;
+    int dataHaz;
+    int prevDataHaz;
     flag stop;
 
     Processor(ifstream &icache, ifstream &dcache, ifstream &rfIn) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz, stop) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz, stop), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz, halt) , I$(icache), D$(dcache) , rf(rfIn) 
@@ -255,7 +256,7 @@ public:
         MEWB2.valid = false;
         pc.write(0);
         halt = false;
-        prevBranchRes = true;
+        prevBranchRes = false;
         branch_resolved = true;
         dataHaz = false;
         prevDataHaz = false;

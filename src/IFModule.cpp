@@ -2,7 +2,8 @@
 
 void IFModule::run() 
 {
-    if(stop || !branch_resolved || dataHaz || prevDataHaz)
+    cout<<"br "<<branch_resolved<<" dh "<<dataHaz<<endl;
+    if(stop || !branch_resolved || dataHaz)
     {
         prevDataHaz = dataHaz;
         ifidbuf.valid = false;

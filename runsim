@@ -1,9 +1,10 @@
-cd Assembler/
-./msasm input output
-cd ../input/
-g++ generate.cpp -o generate
-./generate ../Assembler/output DCacheInput.txt rfInput.txt
-cd ../
+# cd Assembler/
+# g++ msasm.cpp -o msasm
+# ./msasm input output
+# cd ../input/
+# g++ generate.cpp -o generate
+# ./generate ../Assembler/output 0 0
+# cd ../
 make clean
 make
 bin/simm
