@@ -96,6 +96,7 @@ void IDRFModule::run(int x)
                 RF.R[r1].dh=true;
                 dataHaz++;
             }
+            
         }
         else if(RF.R[r1].valid && RF.R[r2].valid)
         {
@@ -150,22 +151,30 @@ void IDRFModule::run(int x)
         int8 r1 = (instruction & 0x0f00)>>8;
         int8 r2 = (instruction & 0x00f0)>>4;
         int8 x = (instruction & 0x000f);
-        idexbuf.src1 = RF.read(r1);
-        idexbuf.src2 = RF.read(r2);
+        idexbuf.src1 = RF.read(r2);
+        idexbuf.src2 = RF.read(r1);
         idexbuf.offset = x;
-        if(RF.R[r1].valid)
+        if(RF.R[r1].valid && RF.R[r2].valid)
         {
-            idexbuf.src1 = r1;
             idexbuf.src2 = RF.read(r2);
+            idexbuf.src1 = RF.read(r1);
             idexbuf.offset = x;
         }
         else
         {
             stall = true;
             idexbuf.valid = false;
-            RF.R[r1].dh = true;
-            dataHaz++;
-        } 
+            if(!RF.R[r1].valid)  
+            {
+                RF.R[r1].dh=true;
+                dataHaz++;
+            }
+            if(!RF.R[r2].valid && r1!=r2) 
+            {
+                RF.R[r2].dh=true;
+                dataHaz++;
+            }
+        }
     }
 
     if(opcode == 10)

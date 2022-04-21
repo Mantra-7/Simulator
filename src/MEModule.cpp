@@ -22,6 +22,7 @@ void MEModule::run()
     {
         //cout<<"MEM: Loading from address "<<exmebuf.alu_result<<endl;
         int val = D$.request(exmebuf.alu_result);
+        //cout<<"val is "<<val<<endl;
         LMD.write(val); 
         mewbbuf.load = true;
     }

@@ -26,6 +26,7 @@ void Processor::run()
     IDEX2 = IDEX1;
     EXME2 = EXME1;
     MEWB2 = MEWB1;
+    LMD2 = LMD1;
 }
 
 void Processor::flushIFID()

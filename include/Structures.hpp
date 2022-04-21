@@ -226,7 +226,8 @@ public:
     RegisterFile rf;
     PC pc;
     Register16 IR;
-    Register LMD;
+    Register LMD1;
+    Register LMD2;
 
     IFModule IF;
     IFIDBuffer IFID1;
@@ -250,7 +251,7 @@ public:
     int prevDataHaz;
     flag stop;
 
-    Processor(ifstream &icache, ifstream &dcache, ifstream &rfIn) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz, stop) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz, stop), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD), WB(rf, MEWB2, LMD, dataHaz, halt) , I$(icache), D$(dcache) , rf(rfIn) 
+    Processor(ifstream &icache, ifstream &dcache, ifstream &rfIn) : IF(pc, I$, IR, IFID1, branch_resolved, dataHaz, prevDataHaz, stop) , IDRF(rf, D$, IFID2, IDEX1, branch_resolved, dataHaz, stop), EX(alu, pc, rf, IDEX2, EXME1, branch_resolved), MEM(D$, EXME2, MEWB1, LMD1), WB(rf, MEWB2, LMD2, dataHaz, halt) , I$(icache), D$(dcache) , rf(rfIn) 
     {
         IFID2.valid = false;
         IDEX2.valid = false;
