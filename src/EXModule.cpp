@@ -103,7 +103,6 @@ void EXModule::run()
         exmebuf.jump = true;
         exmebuf.alu_result = alu.adder(pc.read(),sign_Extension8(idexbuf.jump_addr << 1),false);
         pc.write(exmebuf.alu_result);
-        stall = true;
         branch_resolved = true;
         return;
     }
@@ -117,7 +116,6 @@ void EXModule::run()
             exmebuf.alu_result = alu.adder(pc.read(),sign_Extension8(idexbuf.jump_addr << 1),false);
             pc.write(exmebuf.alu_result);
             idexbuf.valid = false;
-            stall = true;
         }
         branch_resolved = true;
         return;
