@@ -33,7 +33,8 @@ void DCache::output(ofstream &fout)
     {
         for(int j = 0; j < BLOCK_SIZE; j++)
         {
-            fout<<hex<<(int)m_data[i].m_offset[j]<<endl;
+            int y=(int)m_data[i].m_offset[j];
+            cout<<hex<<(y&0xf0)<<(y&0x0f)<<endl;
         }
     }
 }
