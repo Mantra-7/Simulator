@@ -1,8 +1,8 @@
 #include "../include/Structures.hpp"
 
-void IDRFModule::run(int x)
+void IDRFModule::run()
 {
-    if((stop || !ifidbuf.valid || !branch_resolved || dataHaz) && x)
+    if(stop || !ifidbuf.valid || !branch_resolved || dataHaz)
     {
         stall = true;
         idexbuf.valid = false;
@@ -90,6 +90,7 @@ void IDRFModule::run(int x)
             {
                 idexbuf.src1 = RF.read(r1);
                 idexbuf.dest = r3;
+                RF.R[r3].valid = false;
                 idexbuf.subop = opcode & 0x03;
             }
             else
@@ -158,9 +159,7 @@ void IDRFModule::run(int x)
         int8 r1 = (instruction & 0x0f00)>>8;
         int8 r2 = (instruction & 0x00f0)>>4;
         int8 x = (instruction & 0x000f);
-        idexbuf.src1 = RF.read(r2);
-        idexbuf.src2 = RF.read(r1);
-        idexbuf.offset = x;
+
         if(RF.R[r1].valid && RF.R[r2].valid)
         {
             idexbuf.src2 = RF.read(r2);
