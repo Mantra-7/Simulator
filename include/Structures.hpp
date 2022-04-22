@@ -148,7 +148,7 @@ public:
     flag &branch_resolved;
     int &dataHaz;
     flag &stop;
-    void run();
+    void run(int x);
 };
 
 class EXMEBuffer{

@@ -155,7 +155,7 @@ void processADD(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processSUB(string line)
@@ -268,7 +268,7 @@ void processSUB(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processMUL(string line)
@@ -381,7 +381,7 @@ void processMUL(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processINC(string line)
@@ -434,7 +434,7 @@ void processINC(string line)
     }
 
     inst+="00";
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processAND(string line)
@@ -547,7 +547,7 @@ void processAND(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processOR(string line)
@@ -660,7 +660,7 @@ void processOR(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processXOR(string line)
@@ -773,7 +773,7 @@ void processXOR(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processNOT(string line)
@@ -856,7 +856,7 @@ void processNOT(string line)
         return;
     }
     inst+="0";
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processLOAD(string line)
@@ -958,7 +958,7 @@ void processLOAD(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processSTORE(string line)
@@ -1060,7 +1060,7 @@ void processSTORE(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processJMP(string line)
@@ -1109,7 +1109,7 @@ void processJMP(string line)
         return;
     }
     inst+="0";
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processBEQZ(string line)
@@ -1185,7 +1185,7 @@ void processBEQZ(string line)
         invalid = true;
         return;
     }
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processHLT(string line)
@@ -1216,7 +1216,7 @@ void processHLT(string line)
         }
     }
     inst+="000";
-    res<<inst<<endl;
+    res<<inst.substr(0,2)<<endl<<inst.substr(2,2)<<endl;
 }
 
 void processLine(string line)

@@ -1,8 +1,8 @@
 #include "../include/Structures.hpp"
 
-void IDRFModule::run()
+void IDRFModule::run(int x)
 {
-    if(stop || !ifidbuf.valid || !branch_resolved || dataHaz)
+    if((stop || !ifidbuf.valid || !branch_resolved || dataHaz) && x)
     {
         stall = true;
         idexbuf.valid = false;
