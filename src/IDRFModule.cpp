@@ -30,6 +30,7 @@ void IDRFModule::run(int x)
         int8 r3 = (instruction & 0x0f00)>>8;
         int8 r1 = (instruction & 0x00f0)>>4;
         int8 r2 = (instruction & 0x000f);
+        // increment
         if(opcode == 3) 
         {
             if(RF.R[r3].valid)
@@ -48,6 +49,7 @@ void IDRFModule::run(int x)
                 RF.R[r3].dh = true;
             }
         }
+        // add, mul, sub
         else if(RF.R[r1].valid && RF.R[r2].valid)
         {
             idexbuf.src1 = RF.read(r1);
@@ -81,6 +83,7 @@ void IDRFModule::run(int x)
         int8 r1 = (instruction & 0x00f0)>>4;
         int8 r2 = (instruction & 0x000f);
 
+        // not
         if(opcode==6)
         {
             if(RF.R[r1].valid)
@@ -98,6 +101,8 @@ void IDRFModule::run(int x)
             }
             
         }
+
+        // and , or, xor
         else if(RF.R[r1].valid && RF.R[r2].valid)
         {
             idexbuf.src1 = RF.read(r1);
@@ -122,7 +127,8 @@ void IDRFModule::run(int x)
             }
         }
     }
-
+    
+    // load
     if(opcode == 8)
     {
         idexbuf.load = true;
@@ -145,6 +151,7 @@ void IDRFModule::run(int x)
         }   
     }
 
+    // store
     if(opcode == 9)
     {
         idexbuf.store = true;
@@ -177,6 +184,7 @@ void IDRFModule::run(int x)
         }
     }
 
+    //jmp
     if(opcode == 10)
     {
         branch_resolved = false;
@@ -184,6 +192,7 @@ void IDRFModule::run(int x)
         idexbuf.jump_addr = (instruction & 0x0ff0)>>4;
     }
 
+    //beqz
     if(opcode == 11)
     {
         branch_resolved = false;
@@ -191,7 +200,6 @@ void IDRFModule::run(int x)
         int8 r1 = (instruction & 0x0f00)>>8;
         if(!RF.R[r1].valid)
         {
-            //cout<<"huh"<<endl;
             stall = true;
             idexbuf.valid = false;
             RF.R[r1].dh = true;
