@@ -24,18 +24,16 @@ Put all inputs properly in input folder by running above code.
 
 ### Single File Version:
 
-g++ PipelineProcessor.cpp -o PipelineProcessor
+g++ PipelineProcessor.cpp -o PipelineProcessor\
 ./PipelineProcessor
 
 ### Distributed Version:
 
-Create executable using makefile -
-
-make clean
-
+Create executable using makefile -\
+make clean\
 make
 
-Run the simulator -
+Run the simulator -\
 bin/simm
 
 runsim executes these 3 commands in order.
