@@ -30,7 +30,9 @@ g++ PipelineProcessor.cpp -o PipelineProcessor
 ### Distributed Version:
 
 Create executable using makefile -
+
 make clean
+
 make
 
 Run the simulator -
