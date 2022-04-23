@@ -263,6 +263,7 @@ public:
         branch_resolved = true;
         dataHaz = false;
         prevDataHaz = false;
+        stop = false;
     }
 
     void run();
