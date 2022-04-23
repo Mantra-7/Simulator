@@ -3,7 +3,7 @@
 void Processor::run()
 {
     IF.run();
-    IDRF.run(1);
+    IDRF.run();
     if(prevBranchRes && !branch_resolved)
     {
         //cout<<"flush"<<endl;
@@ -17,7 +17,7 @@ void Processor::run()
     //cout<<"datahaz bef is "<<dataHaz<<endl;
     if(prevdh && !dataHaz)
     {
-        IDRF.run(0);
+        IDRF.run();
         IFID2 = IFID1;
         IFID2.valid = true;
     }

@@ -45,6 +45,6 @@ void RegisterFile::output(ofstream &fout)
 {
     for(int i = 0; i < NUM_REGS; i++)
     {
-        fout << hex << R[i].read() << endl;
+        fout << hex << ((R[i].read() & 0xf0) >> 4) << (R[i].read() & 0xf) << endl;
     }
 }
