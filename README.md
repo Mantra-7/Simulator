@@ -4,6 +4,8 @@ This is a pipelined processor simulator. You can give instructions, data cache s
 
 You can also use assembler given to make binary instructions from assembly. Butif you already have the input files in input folder then you can directly go to instructions to run the simulator. 
 
+There are 2 versions of this simulator. One of them has all code in a single file named PipelineProcessor.cpp and other has code distributed over multiple c++ files.
+
 ## Instructions to run assembler:
 
 Go to Assembler folder -
@@ -20,6 +22,13 @@ You can use generate.cpp file to get this instructions in output file in input/I
 
 Put all inputs properly in input folder by running above code.
 
+### Single File Version:
+
+g++ PipelineProcessor.cpp -o PipelineProcessor
+./PipelineProcessor
+
+### Distributed Version:
+
 Create executable using makefile -
 make clean
 make
@@ -28,6 +37,7 @@ Run the simulator -
 bin/simm
 
 runsim executes these 3 commands in order.
+
 ## Outputs
 
 Outputs are given in output folder.
