@@ -274,6 +274,7 @@ public:
 PC pc;
 ICache icache;
 DCache dcache;
+ALU alu;
 RegisterFile ARF;
 RenameRegisterFile RRF;
 instbufelem FetchDecodeBuf[8];
@@ -352,6 +353,7 @@ void Decode()
 
         int16 opcode = instruction >> 12;
         DispatchBuf[free].opcode = opcode;
+        DispatchBuf[free].subop = opcode>>2;
 
         if(opcode<4)
         {
@@ -627,6 +629,52 @@ void Dispatch()
                     DispatchBuf[i].busy = false;
                 }
             }
+        }
+    }
+}
+
+void intexecute()
+{
+    int ready=-1;
+    for(int i=0;i<8;i++)
+    {
+        if(intResSt[i].ready)
+        {
+            ready=i;
+            break;
+        }
+    }
+
+    if(ready!=-1)
+    {
+        dispbufelem inst = intResSt[ready].elem;
+        
+        if(inst.arithmatic)
+        {
+            int result;
+            
+            if(inst.subop==0) result=alu.adder(inst.src1.read(),inst.src2.read(),0);
+            if(inst.subop==1) result=alu.adder(inst.src1.read(),inst.src2.read(),1);
+            if(inst.subop==2) result=alu.adder(inst.src1.read(),1,0);
+            if(inst.subop==3) result=alu.MUL(inst.src1.read(),inst.src2.read());
+
+            int tag = inst.dest;
+            RRF.R[tag].write(result);
+            RRF.R[tag].valid = true;
+        }
+
+        if(inst.logical)
+        {
+            int result;
+            
+            if(inst.subop==0) result=alu.AND(inst.src1.read(),inst.src2.read());
+            if(inst.subop==1) result=alu.OR(inst.src1.read(),inst.src2.read());
+            if(inst.subop==2) result=alu.NOT(inst.src2.read());
+            if(inst.subop==3) result=alu.XOR(inst.src1.read(),inst.src2.read());
+
+            int tag = inst.dest;
+            RRF.R[tag].write(result);
+            RRF.R[tag].valid = true;
         }
     }
 }
