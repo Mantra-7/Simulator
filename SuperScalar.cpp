@@ -263,6 +263,14 @@ public:
     int dest;
 };
 
+class ResStElem
+{
+public:
+    dispbufelem elem;
+    flag busy;
+    flag ready;
+};
+
 PC pc;
 ICache icache;
 DCache dcache;
@@ -270,6 +278,9 @@ RegisterFile ARF;
 RenameRegisterFile RRF;
 instbufelem FetchDecodeBuf[8];
 dispbufelem DispatchBuf[8];
+ResStElem intResSt[8];
+ResStElem branchResSt[8];
+ResStElem loadStoreResSt[8];
 
 void Fetch()
 {
@@ -360,7 +371,7 @@ void Decode()
                 else
                 {
                     int tag = ARF.R[r3].tag;
-                    DispatchBuf[free].src1 = RRF.R[tag];
+                    DispatchBuf[free].src1.tag = tag;
                 }
 
                 int rfree=findFree();
@@ -380,7 +391,7 @@ void Decode()
                 else
                 {
                     int tag = ARF.R[r1].tag;
-                    DispatchBuf[free].src1 = RRF.R[tag];
+                    DispatchBuf[free].src1.tag = tag;
                 }
 
                 if(!ARF.R[r2].busy)
@@ -390,7 +401,7 @@ void Decode()
                 else
                 {
                     int tag = ARF.R[r2].tag;
-                    DispatchBuf[free].src2 = RRF.R[tag];
+                    DispatchBuf[free].src2.tag = tag;
                 }
 
                 int rfree=findFree();
@@ -421,7 +432,7 @@ void Decode()
                 else
                 {
                     int tag = ARF.R[r1].tag;
-                    DispatchBuf[free].src1 = RRF.R[tag];
+                    DispatchBuf[free].src1.tag = tag;
                 }
 
                 int rfree=findFree();
@@ -444,7 +455,7 @@ void Decode()
                 else
                 {
                     int tag = ARF.R[r1].tag;
-                    DispatchBuf[free].src1 = RRF.R[tag];
+                    DispatchBuf[free].src1.tag = tag;
                 }   
                 if(!ARF.R[r2].busy)
                 {
@@ -453,7 +464,7 @@ void Decode()
                 else
                 {
                     int tag = ARF.R[r2].tag;
-                    DispatchBuf[free].src2 = RRF.R[tag];
+                    DispatchBuf[free].src2.tag = tag;
                 }
 
                 int rfree=findFree();
@@ -470,9 +481,11 @@ void Decode()
         if(opcode == 8)
         {
             DispatchBuf[free].load = true;
+
             int offset = (instruction & 0x000f);
             int8 r2 = (instruction & 0x00f0)>>4;
             int8 r1 = (instruction & 0x0f00)>>8;
+
             if(!ARF.R[r2].busy)
             {
                 DispatchBuf[free].src2 = ARF.R[r2];
@@ -480,8 +493,9 @@ void Decode()
             else
             {
                 int tag = ARF.R[r2].tag;
-                DispatchBuf[free].src2 = RRF.R[tag];
+                DispatchBuf[free].src2.tag = tag;
             }
+
             int rfree=findFree();
             ARF.R[r1].busy = true;
             ARF.R[r1].tag = rfree;
@@ -489,6 +503,7 @@ void Decode()
             DispatchBuf[free].dest = rfree;
             RRF.R[rfree].busy = true;
             RRF.R[rfree].valid = false;
+
             DispatchBuf[free].offset = offset;            
         }
 
@@ -496,9 +511,11 @@ void Decode()
         if(opcode == 9)
         {
             DispatchBuf[free].store = true;
+
             int offset = (instruction & 0x000f);
             int8 r2 = (instruction & 0x00f0)>>4;
             int8 r1 = (instruction & 0x0f00)>>8;
+
             if(!ARF.R[r1].busy)
             {
                 DispatchBuf[free].src1 = ARF.R[r1];
@@ -506,8 +523,9 @@ void Decode()
             else
             {
                 int tag = ARF.R[r1].tag;
-                DispatchBuf[free].src1 = RRF.R[tag];
+                DispatchBuf[free].src1.tag = tag;
             }
+
             if(!ARF.R[r2].busy)
             {
                 DispatchBuf[free].src2 = ARF.R[r2];
@@ -515,8 +533,9 @@ void Decode()
             else
             {
                 int tag = ARF.R[r2].tag;
-                DispatchBuf[free].src2 = RRF.R[tag];
+                DispatchBuf[free].src2.tag = tag;
             }
+
             DispatchBuf[free].offset = offset;
         }
 
@@ -538,4 +557,92 @@ void Decode()
             //stop = true;
         }
     }
+}
+
+void Dispatch()
+{
+    for(int i=0;i<256;i++)
+    {
+        if(DispatchBuf[i].busy)
+        {
+            if(DispatchBuf[i].arithmatic || DispatchBuf[i].logical)
+            {
+                flag passed=false;
+                for(int j=0;j<8;j++)
+                {
+                    if(!intResSt[j].busy)
+                    {
+                        intResSt[j].elem = DispatchBuf[i];
+                        intResSt[j].busy = true;
+                        intResSt[j].ready = false;
+                        passed = true;
+                        break;
+                    }
+                }
+
+                if(passed)
+                {
+                    DispatchBuf[i].busy = false;
+                }
+            }
+
+            if(DispatchBuf[i].beqz || DispatchBuf[i].jump)
+            {
+                flag passed=false;
+                for(int j=0;j<8;j++)
+                {
+                    if(!branchResSt[j].busy)
+                    {
+                        branchResSt[j].elem = DispatchBuf[i];
+                        branchResSt[j].busy = true;
+                        branchResSt[j].ready = false;
+                        passed = true;
+                        break;
+                    }
+                }
+
+                if(passed)
+                {
+                    DispatchBuf[i].busy = false;
+                }
+            }
+            
+            if(DispatchBuf[i].load || DispatchBuf[i].store)
+            {
+                flag passed=false;
+                for(int j=0;j<8;j++)
+                {
+                    if(!loadStoreResSt[j].busy)
+                    {
+                        loadStoreResSt[j].elem = DispatchBuf[i];
+                        loadStoreResSt[j].busy = true;
+                        loadStoreResSt[j].ready = false;
+                        passed = true;
+                        break;
+                    }
+                }
+
+                if(passed)
+                {
+                    DispatchBuf[i].busy = false;
+                }
+            }
+        }
+    }
+}
+
+void execute()
+{
+    intexecute();
+    branchexecute();
+    loadstoreexecute();
+}
+
+void execute_cycle()
+{
+    execute();
+    RSdispatch();
+    Dispatch();
+    Decode();
+    Fetch();
 }
