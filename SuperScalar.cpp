@@ -752,7 +752,10 @@ void loadstoreexecute()
     addressGeneration(lsbuff[0]);
 }
 
-
+void branchexecute()
+{
+    
+}
 
 void execute()
 {
