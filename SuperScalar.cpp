@@ -261,6 +261,9 @@ public:
     Register src1;
     Register src2;
     int dest;
+    dispbufelem(){
+        busy = false;
+    }
 };
 
 class ResStElem
@@ -678,6 +681,78 @@ void intexecute()
         }
     }
 }
+
+dispbufelem lsbuff[3];
+int addressbuf = -1;
+int destaddressbuf = -1;
+
+void addressGeneration(dispbufelem inst)
+{
+    if(inst.busy)
+    {
+        int src2 = inst.src2.read();
+        int offset = inst.offset;
+        int result = alu.adder(src2,offset,0);
+        addressbuf = result;
+    }
+}
+
+void addressTranslation(dispbufelem inst)
+{
+    if(addressbuf!=-1 && inst.busy)
+    {
+        if(inst.load)
+        {
+            destaddressbuf = dcache.request(addressbuf);
+        }
+        else
+        { 
+            destaddressbuf = -1;
+            dcache.write(addressbuf,inst.src1.read());
+        }    
+    }
+}
+
+void loading(dispbufelem inst)
+{
+    if(destaddressbuf!=-1 && inst.busy)
+    {
+        if(inst.load)
+        {
+            int tag = inst.dest;
+            RRF.R[tag].write(destaddressbuf);
+            RRF.R[tag].valid = true;
+        }
+    }
+}
+
+void loadstoreexecute()
+{
+    int ready=-1;
+    for(int i=0;i<8;i++)
+    {
+        if(intResSt[i].ready)
+        {
+            ready=i;
+            break;
+        }
+    }
+    lsbuff[2] = lsbuff[1];
+    lsbuff[1] = lsbuff[0];
+    if(ready==-1)
+    {
+        lsbuff[0] = dispbufelem(); 
+    }
+    else
+    {
+        lsbuff[0] = intResSt[ready].elem;
+    }
+    loading(lsbuff[2]);
+    addressTranslation(lsbuff[1]);
+    addressGeneration(lsbuff[0]);
+}
+
+
 
 void execute()
 {
