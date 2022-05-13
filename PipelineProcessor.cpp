@@ -16,6 +16,7 @@ class Register
 public:
     flag valid=true;
     flag dh=false;
+    int tag;
     int8 read();
     void write(int8 val); 
 };
