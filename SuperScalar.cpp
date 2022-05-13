@@ -247,6 +247,7 @@ public:
     int opcode;
     int subop;
     bool busy;
+    int offset;
 
     flag arithmatic;
     flag logical;
@@ -259,7 +260,7 @@ public:
 
     Register src1;
     Register src2;
-    Register dest;
+    int dest;
 };
 
 PC pc;
@@ -349,33 +350,57 @@ void Decode()
             int8 r1 = (instruction & 0x00f0)>>4;
             int8 r2 = (instruction & 0x000f);
 
-            if(!ARF.R[r1].busy)
+            //inc 
+            if(opcode==3)
             {
-                DispatchBuf[free].src1 = ARF.R[r1];
+                if(!ARF.R[r3].busy)
+                {
+                    DispatchBuf[free].src1 = ARF.R[r3];
+                }
+                else
+                {
+                    int tag = ARF.R[r3].tag;
+                    DispatchBuf[free].src1 = RRF.R[tag];
+                }
+
+                int rfree=findFree();
+                ARF.R[r3].busy = true;
+                ARF.R[r3].tag = rfree;
+
+                DispatchBuf[free].dest = rfree;
+                RRF.R[rfree].busy = true;
+                RRF.R[rfree].valid = false;
             }
             else
             {
-                int tag = ARF.R[r1].tag;
-                DispatchBuf[free].src1 = RRF.R[tag];
-            }
+                if(!ARF.R[r1].busy)
+                {
+                    DispatchBuf[free].src1 = ARF.R[r1];
+                }
+                else
+                {
+                    int tag = ARF.R[r1].tag;
+                    DispatchBuf[free].src1 = RRF.R[tag];
+                }
 
-            if(!ARF.R[r2].busy)
-            {
-                DispatchBuf[free].src2 = ARF.R[r2];
-            }
-            else
-            {
-                int tag = ARF.R[r2].tag;
-                DispatchBuf[free].src2 = RRF.R[tag];
-            }
+                if(!ARF.R[r2].busy)
+                {
+                    DispatchBuf[free].src2 = ARF.R[r2];
+                }
+                else
+                {
+                    int tag = ARF.R[r2].tag;
+                    DispatchBuf[free].src2 = RRF.R[tag];
+                }
 
-            int rfree=findFree();
-            ARF.R[r3].busy = true;
-            ARF.R[r3].tag = rfree;
+                int rfree=findFree();
+                ARF.R[r3].busy = true;
+                ARF.R[r3].tag = rfree;
 
-            DispatchBuf[free].dest = RRF.R[rfree];
-            RRF.R[rfree].busy = true;
-            RRF.R[rfree].valid = false;
+                DispatchBuf[free].dest = rfree;
+                RRF.R[rfree].busy = true;
+                RRF.R[rfree].valid = false;
+            }            
         }
 
         else if(opcode<8)
@@ -389,46 +414,55 @@ void Decode()
             // not
             if(opcode==6)
             {
-                if(RF.R[r1].valid)
+                if(!ARF.R[r1].busy)
                 {
-                    DispatchBuf[free].src1 = RF.read(r1);
-                    DispatchBuf[free].dest = r3;
-                    RF.R[r3].valid = false;
-                    DispatchBuf[free].subop = opcode & 0x03;
+                    DispatchBuf[free].src1 = ARF.R[r1];
                 }
                 else
                 {
-                    stall = true;
-                    DispatchBuf[free].valid = false;
-                    RF.R[r1].dh=true;
-                    dataHaz++;
+                    int tag = ARF.R[r1].tag;
+                    DispatchBuf[free].src1 = RRF.R[tag];
                 }
+
+                int rfree=findFree();
+                ARF.R[r3].busy = true;
+                ARF.R[r3].tag = rfree;
+
+                DispatchBuf[free].dest = rfree;
+                RRF.R[rfree].busy = true;
+                RRF.R[rfree].valid = false;
                 
             }
 
             // and , or, xor
-            else if(RF.R[r1].valid && RF.R[r2].valid)
-            {
-                DispatchBuf[free].src1 = RF.read(r1);
-                DispatchBuf[free].src2 = RF.read(r2);
-                DispatchBuf[free].dest = r3;
-                RF.R[r3].valid = false;
-                DispatchBuf[free].subop = opcode & 0x03;
-            }
             else
             {
-                stall = true;
-                DispatchBuf[free].valid = false;
-                if(!RF.R[r1].valid)  
+                if(!ARF.R[r1].busy)
                 {
-                    RF.R[r1].dh=true;
-                    dataHaz++;
+                    DispatchBuf[free].src1 = ARF.R[r1];
                 }
-                if(!RF.R[r2].valid && r1!=r2) 
+                else
                 {
-                    RF.R[r2].dh=true;
-                    dataHaz++;
+                    int tag = ARF.R[r1].tag;
+                    DispatchBuf[free].src1 = RRF.R[tag];
+                }   
+                if(!ARF.R[r2].busy)
+                {
+                    DispatchBuf[free].src2 = ARF.R[r2];
                 }
+                else
+                {
+                    int tag = ARF.R[r2].tag;
+                    DispatchBuf[free].src2 = RRF.R[tag];
+                }
+
+                int rfree=findFree();
+                ARF.R[r3].busy = true;
+                ARF.R[r3].tag = rfree;
+
+                DispatchBuf[free].dest = rfree;
+                RRF.R[rfree].busy = true;
+                RRF.R[rfree].valid = false;
             }
         }
         
@@ -436,88 +470,72 @@ void Decode()
         if(opcode == 8)
         {
             DispatchBuf[free].load = true;
-            int8 r1 = (instruction & 0x0f00)>>8;
+            int offset = (instruction & 0x000f);
             int8 r2 = (instruction & 0x00f0)>>4;
-            int8 x = (instruction & 0x000f);
-            if(RF.R[r2].valid)
+            int8 r1 = (instruction & 0x0f00)>>8;
+            if(!ARF.R[r2].busy)
             {
-                DispatchBuf[free].src1 = r1;
-                DispatchBuf[free].src2 = RF.read(r2);
-                DispatchBuf[free].offset = x;
-                RF.R[r1].valid = false;
+                DispatchBuf[free].src2 = ARF.R[r2];
             }
             else
             {
-                stall = true;
-                DispatchBuf[free].valid = false;
-                RF.R[r2].dh = true;
-                dataHaz++;
-            }   
+                int tag = ARF.R[r2].tag;
+                DispatchBuf[free].src2 = RRF.R[tag];
+            }
+            int rfree=findFree();
+            ARF.R[r1].busy = true;
+            ARF.R[r1].tag = rfree;
+
+            DispatchBuf[free].dest = rfree;
+            RRF.R[rfree].busy = true;
+            RRF.R[rfree].valid = false;
+            DispatchBuf[free].offset = offset;            
         }
 
         // store
         if(opcode == 9)
         {
             DispatchBuf[free].store = true;
-            int8 r1 = (instruction & 0x0f00)>>8;
+            int offset = (instruction & 0x000f);
             int8 r2 = (instruction & 0x00f0)>>4;
-            int8 x = (instruction & 0x000f);
-
-            if(RF.R[r1].valid && RF.R[r2].valid)
+            int8 r1 = (instruction & 0x0f00)>>8;
+            if(!ARF.R[r1].busy)
             {
-                DispatchBuf[free].src2 = RF.read(r2);
-                DispatchBuf[free].src1 = RF.read(r1);
-                DispatchBuf[free].offset = x;
+                DispatchBuf[free].src1 = ARF.R[r1];
             }
             else
             {
-                stall = true;
-                DispatchBuf[free].valid = false;
-                if(!RF.R[r1].valid)  
-                {
-                    RF.R[r1].dh=true;
-                    dataHaz++;
-                }
-                if(!RF.R[r2].valid && r1!=r2) 
-                {
-                    RF.R[r2].dh=true;
-                    dataHaz++;
-                }
+                int tag = ARF.R[r1].tag;
+                DispatchBuf[free].src1 = RRF.R[tag];
             }
+            if(!ARF.R[r2].busy)
+            {
+                DispatchBuf[free].src2 = ARF.R[r2];
+            }
+            else
+            {
+                int tag = ARF.R[r2].tag;
+                DispatchBuf[free].src2 = RRF.R[tag];
+            }
+            DispatchBuf[free].offset = offset;
         }
 
         //jmp
         if(opcode == 10)
         {
-            branch_resolved = false;
-            DispatchBuf[free].jump = true;
-            DispatchBuf[free].jump_addr = (instruction & 0x0ff0)>>4;
+            //huh
         }
 
         //beqz
         if(opcode == 11)
         {
-            DispatchBuf[free].beqz = true;
-            int8 r1 = (instruction & 0x0f00)>>8;
-            if(!RF.R[r1].valid)
-            {
-                stall = true;
-                DispatchBuf[free].valid = false;
-                RF.R[r1].dh = true;
-                dataHaz++;
-            }
-            else
-            {
-                branch_resolved = false;
-                DispatchBuf[free].src1 = RF.read(r1);
-                DispatchBuf[free].jump_addr = instruction & 0x00ff;
-            }
+            //huh
         }
 
         if(opcode==15)
         {
             DispatchBuf[free].halt = true;
-            stop = true;
+            //stop = true;
         }
     }
 }
