@@ -73,6 +73,7 @@ class PC
 {
     int8 m_addr;
 public:
+    PC() : m_addr(0){}
     int8 read();
     void write(int8 addr);
     void increment();
@@ -93,6 +94,7 @@ public:
 
 int8 ALU::adder(int8 X , int8 Y, flag as)
 {
+    //cout<<"add"<<endl;
     if(!as)
     {
         return X + Y;
@@ -105,26 +107,31 @@ int8 ALU::adder(int8 X , int8 Y, flag as)
 
 int8 ALU::MUL(int8 X, int8 Y)
 {
+    //cout<<"mul"<<endl;
     return X * Y;
 }
 
 int8 ALU::OR(int8 X, int8 Y)
 {
+    //cout<<"or"<<endl;
     return X | Y;
 }
 
 int8 ALU::AND(int8 X, int8 Y)
 {
+    //cout<<"and"<<endl;
     return X & Y;
 }
 
 int8 ALU::NOT(int8 X)
 {
+    //cout<<"not"<<endl;
     return ~X;
 }
 
 int8 ALU::XOR(int8 X, int8 Y)
 {
+    //cout<<"xor"<<endl;
     return X ^ Y;
 }
 
@@ -135,10 +142,10 @@ flag ALU::BEQZ(int X)
 
 int8 DCache::request(int8 addr)
 {
-    //cout<<"req "<<(int)addr<<endl;
+    ////cout<<"req "<<(int)addr<<endl;
     int set = addr >> 2;
     int offset = addr & 3;
-    //cout<<"getting "<<(int)m_data[set].m_offset[offset]<<endl;
+    ////cout<<"getting "<<(int)m_data[set].m_offset[offset]<<endl;
     return m_data[set].m_offset[offset];
 }
 
@@ -182,7 +189,7 @@ ICache::ICache(ifstream &fin)
         int16 x = input;
         fin>>hex>>input;
         x = (x<<8) + input;
-        //cout<<"input "<<x<<endl;
+        // //cout<<"input "<<x<<endl;
         write(addr, x);
         addr += 2;
     }
@@ -195,6 +202,7 @@ int16 ICache::request(int8 addr)
     int offset = addr & 3;
     int16 little = m_data[set].m_offset[offset];
     int16 big = m_data[set].m_offset[offset + 1];
+    // //cout<<"ICache: "<< (int)little<<" "<<(int)big<<endl;
     return (little<<8) + big;
 }
 
@@ -204,6 +212,7 @@ void ICache::write(int8 addr, int16 val)
     int offset = addr & 3;
     m_data[set].m_offset[offset] = val >> 8;
     m_data[set].m_offset[offset + 1] = val & 0xff;
+    // //cout<<"ICache: "<< (int)m_data[set].m_offset[offset]<<" "<<(int)m_data[set].m_offset[offset + 1]<<endl;
 }
 
 int8 Register::read()
@@ -324,18 +333,33 @@ public:
     flag finished;
     dispbufelem elem;
     flag valid;
-    ROBelem() : busy(false) {}
-    ROBelem(dispbufelem d) : elem(d), busy(true) {}
+    ROBelem() : busy(false) , finished(false) {}
+    ROBelem(dispbufelem d) : elem(d), busy(true) , finished(false) {}
 };
 
+ifstream icaches("input/ICache.txt");
+ifstream dcaches("input/DCache.txt");
+ifstream rf("input/RF.txt");
+ofstream dCacheOutput("output/ODCache.txt");
+ofstream rfOutput("output/ORF.txt");
+ofstream stats("output/Output.txt");
+
+int instr = 0;
+int arith = 0;
+int logic = 0;
+int load = 0;
+int store = 0;
+int branch = 0;
+int hlt_cnt=0;
+
 PC pc;
-ICache icache;
-DCache dcache;
+ICache icache(icaches);
+DCache dcache(dcaches);
 ALU alu;
-RegisterFile ARF;
+RegisterFile ARF(rf);
 RenameRegisterFile RRF;
 instbufelem FetchDecodeBuf[8];
-dispbufelem DispatchBuf[8];
+dispbufelem DispatchBuf[256];
 ResStElem intResSt[8];
 ResStElem branchResSt[8];
 ResStElem loadStoreResSt[8];
@@ -356,19 +380,6 @@ bool operator==(const dispbufelem &x, const dispbufelem &y)
 {
     bool ans = true;
     ans = ans && (x.instruction == y.instruction);
-    ans = ans && (x.opcode == y.opcode);
-    ans = ans && (x.subop == y.subop);
-    ans = ans && (x.arithmatic == y.arithmatic);
-    ans = ans && (x.logical == y.logical);
-    ans = ans && (x.branch == y.branch);
-    ans = ans && (x.load == y.load);
-    ans = ans && (x.store == y.store);
-    ans = ans && (x.jump == y.jump);
-    ans = ans && (x.beqz == y.beqz);
-    ans = ans && (x.halt == y.halt);
-    ans = ans && (x.src1 == y.src1);
-    ans = ans && (x.src2 == y.src2);
-    ans = ans && (x.dest == y.dest);
     return ans;
 }
 
@@ -392,6 +403,7 @@ void Fetch()
         int8 addr = pc.read();
         pc.increment();
         FetchDecodeBuf[free].instruction = icache.request(addr);
+        //cout<<"Fetch: "<<hex<<(int)FetchDecodeBuf[free].instruction<<endl;
     }
 }
 
@@ -408,6 +420,8 @@ int findFree()
 
 void Decode()
 {
+    if(halt) return;
+
     int free=-1;
     for(int i=0;i<8;i++)
     {
@@ -441,11 +455,13 @@ void Decode()
         DispatchBuf[free].beqz = false;
         DispatchBuf[free].jump = false;
         DispatchBuf[free].halt = false;
+        DispatchBuf[free].instruction = instruction;
 
         int16 opcode = instruction >> 12;
         DispatchBuf[free].opcode = opcode;
-        DispatchBuf[free].subop = opcode>>2;
+        DispatchBuf[free].subop = (opcode & 0x3);
 
+        //cout<<"Decode: "<<(int)instruction<<endl;
         if(opcode<4)
         {
             DispatchBuf[free].arithmatic = true;
@@ -520,12 +536,12 @@ void Decode()
             {
                 if(!ARF.R[r1].busy)
                 {
-                    DispatchBuf[free].src1 = ARF.R[r1];
+                    DispatchBuf[free].src2 = ARF.R[r1];
                 }
                 else
                 {
                     int tag = ARF.R[r1].tag;
-                    DispatchBuf[free].src1.tag = tag;
+                    DispatchBuf[free].src2.tag = tag;
                 }
 
                 int rfree=findFree();
@@ -654,11 +670,13 @@ void Decode()
 
 void Dispatch()
 {
+    if(halt) return;
+
     for(int i=0;i<256;i++)
     {
         if(DispatchBuf[i].busy)
         {
-            if(DispatchBuf[i].arithmatic || DispatchBuf[i].logical)
+            if(DispatchBuf[i].arithmatic || DispatchBuf[i].logical || DispatchBuf[i].halt)
             {
                 flag passed=false;
                 for(int j=0;j<8;j++)
@@ -670,12 +688,14 @@ void Dispatch()
                         intResSt[j].ready = false;
                         passed = true;
                         ROB.push_back(ROBelem(DispatchBuf[i]));
+                        //cout<<"Dispatching "<<DispatchBuf[i].instruction<<endl;
                         break;
                     }
                 }
 
                 if(passed)
                 {
+                    if(DispatchBuf[i].halt) halt=true;
                     DispatchBuf[i].busy = false;
                 }
             }
@@ -692,6 +712,7 @@ void Dispatch()
                         branchResSt[j].ready = false;
                         passed = true;
                         ROB.push_back(ROBelem(DispatchBuf[i]));
+                        //cout<<"Dispatching "<<DispatchBuf[i].instruction<<endl;
                         break;
                     }
                 }
@@ -714,6 +735,7 @@ void Dispatch()
                         loadStoreResSt[j].ready = false;
                         passed = true;
                         ROB.push_back(ROBelem(DispatchBuf[i]));
+                        // //cout<<"Dispatching "<<DispatchBuf[i].instruction<<"in loadStore"<<endl;
                         break;
                     }
                 }
@@ -723,21 +745,20 @@ void Dispatch()
                     DispatchBuf[i].busy = false;
                 }
             }
-
-            if(DispatchBuf[i].halt)
-            {
-                ROB.push_back(ROBelem(DispatchBuf[i]));
-                halt=true;
-            }
         }
     }
 }
 
 int findInROB(dispbufelem inst)
 {
+    //cout<<"findROB"<<endl;
     for(int i=0;i<ROB.size();i++)
     {
-        if(ROB[i].elem == inst) return i;
+        if(ROB[i].elem == inst) 
+        {
+            //cout<<"found "<<i<<endl;
+            return i;
+        }
     }
 }
 
@@ -746,15 +767,19 @@ void intexecute()
     int ready=-1;
     for(int i=0;i<8;i++)
     {
-        if(intResSt[i].ready)
+        if(intResSt[i].busy && intResSt[i].ready)
         {
             ready=i;
             break;
         }
     }
 
+    //cout<<"int ready "<<dec<<ready<<endl;
+
     if(ready!=-1)
     {
+        intResSt[ready].busy=false;
+        //cout<<"intexecute :"<<hex<<intResSt[ready].elem.instruction<<endl;
         dispbufelem inst = intResSt[ready].elem;
         
         if(inst.arithmatic)
@@ -763,8 +788,8 @@ void intexecute()
             
             if(inst.subop==0) result=alu.adder(inst.src1.read(),inst.src2.read(),0);
             if(inst.subop==1) result=alu.adder(inst.src1.read(),inst.src2.read(),1);
-            if(inst.subop==2) result=alu.adder(inst.src1.read(),1,0);
-            if(inst.subop==3) result=alu.MUL(inst.src1.read(),inst.src2.read());
+            if(inst.subop==3) result=alu.adder(inst.src1.read(),1,0);
+            if(inst.subop==2) result=alu.MUL(inst.src1.read(),inst.src2.read());
 
             int tag = inst.dest;
             RRF.R[tag].write(result);
@@ -773,6 +798,7 @@ void intexecute()
 
         if(inst.logical)
         {
+            //cout<<"logic "<<inst.subop<<endl;
             int result;
             
             if(inst.subop==0) result=alu.AND(inst.src1.read(),inst.src2.read());
@@ -784,6 +810,7 @@ void intexecute()
             RRF.R[tag].write(result);
             RRF.R[tag].valid = true;
         }
+
         int indInROB = findInROB(inst);
         ROB[indInROB].finished = true;
         
@@ -798,6 +825,7 @@ void addressGeneration(dispbufelem inst)
 {
     if(inst.busy)
     {
+        // //cout<<"Load/Store 1 :"<<inst.instruction<<endl;
         int src2 = inst.src2.read();
         int offset = inst.offset;
         int result = alu.adder(src2,offset,0);
@@ -807,8 +835,10 @@ void addressGeneration(dispbufelem inst)
 
 void addressTranslation(dispbufelem inst)
 {
+
     if(addressbuf!=-1 && inst.busy)
     {
+        // //cout<<"Load/Store 2 :"<<inst.instruction<<endl;
         if(inst.load)
         {
             destaddressbuf = dcache.request(addressbuf);
@@ -817,6 +847,9 @@ void addressTranslation(dispbufelem inst)
         { 
             destaddressbuf = -1;
             dcache.write(addressbuf,inst.src1.read());
+
+            int indInROB = findInROB(inst);
+            ROB[indInROB].finished = true;
         }    
     }
 }
@@ -825,11 +858,15 @@ void loading(dispbufelem inst)
 {
     if(destaddressbuf!=-1 && inst.busy)
     {
+        // //cout<<"Load/Store 3 :"<<inst.instruction<<endl;
         if(inst.load)
         {
             int tag = inst.dest;
             RRF.R[tag].write(destaddressbuf);
             RRF.R[tag].valid = true;
+
+            int indInROB = findInROB(inst);
+            ROB[indInROB].finished = true;
         }
     }
 }
@@ -839,21 +876,24 @@ void loadstoreexecute()
     int ready=-1;
     for(int i=0;i<8;i++)
     {
-        if(intResSt[i].ready)
+        if(loadStoreResSt[i].busy && loadStoreResSt[i].ready)
         {
             ready=i;
             break;
         }
     }
+    // //cout<<"ready "<<ready<<endl;
     lsbuff[2] = lsbuff[1];
     lsbuff[1] = lsbuff[0];
+    dispbufelem d;
     if(ready==-1)
     {
-        lsbuff[0] = dispbufelem(); 
+        lsbuff[0] = d; 
     }
     else
     {
-        lsbuff[0] = intResSt[ready].elem;
+        loadStoreResSt[ready].busy=false;
+        lsbuff[0] = loadStoreResSt[ready].elem;
     }
     loading(lsbuff[2]);
     addressTranslation(lsbuff[1]);
@@ -876,42 +916,65 @@ void RSdispatch()
 {
     for(int i=0;i<8;i++)
     {
-        if(intResSt[i].busy)
+        if(intResSt[i].busy && !intResSt[i].ready)
         {
             dispbufelem x = intResSt[i].elem;
             bool ready=true;
 
-            if(x.opcode != 3 && x.opcode!=6)
+            if(x.opcode != 6)
             {
                 if(x.src1.tag!=-1)
                 {
                     if(!RRF.R[x.src1.tag].valid) ready=false;
+                    else
+                    {
+                        intResSt[i].elem.src1.write(RRF.R[x.src1.tag].read());
+                    }
                 }
             }
 
-            if(x.src2.tag!=-1)
+            if(x.opcode != 3)
             {
-                if(!RRF.R[x.src2.tag].valid) ready=false;
+                if(x.src2.tag!=-1)
+                {
+                    if(!RRF.R[x.src2.tag].valid) ready=false;
+                    else
+                    {
+                        intResSt[i].elem.src2.write(RRF.R[x.src2.tag].read());
+                    }
+                }
             }
 
             intResSt[i].ready = ready;
+            if(ready)
+            {
+                //cout<<"RSDispatch :"<<intResSt[i].elem.instruction<<endl;
+            }
         }
     }
 
     for(int i=0;i<8;i++)
     {
-        if(branchResSt[i].busy)
+        if(branchResSt[i].busy && !branchResSt[i].ready)
         {
             dispbufelem x = branchResSt[i].elem;
             bool ready=true;
             if(x.src1.tag!=-1)
             {
                 if(!RRF.R[x.src1.tag].valid) ready=false;
+                else
+                    {
+                        branchResSt[i].elem.src1.write(RRF.R[x.src1.tag].read());
+                    }
             }
 
             if(x.src2.tag!=-1)
             {
                 if(!RRF.R[x.src2.tag].valid) ready=false;
+                else
+                    {
+                        branchResSt[i].elem.src2.write(RRF.R[x.src2.tag].read());
+                    }
             }
 
             branchResSt[i].ready = ready;
@@ -920,22 +983,31 @@ void RSdispatch()
 
     for(int i=0;i<8;i++)
     {
-        if(loadStoreResSt[i].busy)
+        if(loadStoreResSt[i].busy && !loadStoreResSt[i].ready)
         {
             dispbufelem x = loadStoreResSt[i].elem;
             bool ready=true;
+            //cout<<"RSdispatch : "<<hex<<x.instruction<<" "<<dec<<x.src1.tag<<" "<<x.src2.tag<<endl;
 
-            if(x.load)
+            if(x.store)
             {
                 if(x.src1.tag!=-1)
                 {
                     if(!RRF.R[x.src1.tag].valid) ready=false;
+                    else
+                    {
+                        loadStoreResSt[i].elem.src1.write(RRF.R[x.src1.tag].read());
+                    }
                 }
             }
 
             if(x.src2.tag!=-1)
             {
                 if(!RRF.R[x.src2.tag].valid) ready=false;
+                else
+                    {
+                        loadStoreResSt[i].elem.src2.write(RRF.R[x.src2.tag].read());
+                    }
             }
 
             loadStoreResSt[i].ready = ready;
@@ -943,27 +1015,104 @@ void RSdispatch()
     }
 }
 
+
+void popROB()
+{
+    if(ROB.empty()) return;
+
+    ROBelem x = ROB.front();
+
+    if(x.finished)
+    {
+        dispbufelem d = x.elem;
+
+        instr++;
+
+        if(d.arithmatic) arith++;
+        else if(d.load) load++;
+        else if(d.store) store++;
+        else if(d.branch) branch++;
+        else if(d.halt) hlt_cnt++;
+
+
+        if(d.halt) 
+        {
+            stop=true;
+            return;
+        }
+
+        int val = RRF.R[d.dest].read();
+        RRF.R[d.dest].busy = false;
+        
+        for(int i=0;i<16;i++)
+        {
+            if(ARF.R[i].tag==d.dest)
+            {
+                ARF.R[i].tag = -1;
+                ARF.R[i].valid = true;
+                ARF.R[i].busy = false;
+                ARF.R[i].write(val);
+            }
+        }
+
+        ROB.erase(ROB.begin());
+    }
+}
+
+void printROB()
+{
+    //cout<<"ROB: ";
+    for(auto i:ROB)
+    {
+        if(i.finished) 
+        {
+            //cout<<"1 ";
+        }
+        else 
+        {
+            //cout<<"0 ";
+        }
+    }
+    //cout<<endl;
+}
+
 void execute_cycle()
 {
     RSdispatch();
-    execute();
+    // //cout<<1<<endl;
     Dispatch();
+    // //cout<<2<<endl;
+    execute();
+    // //cout<<3<<endl;
     Decode();
+    // //cout<<4<<endl;
     Fetch();
+    // //cout<<5<<endl;        
+    popROB();
+    // //cout<<6<<endl;
 }
 
 int main()
 {
-    ifstream icache("input/ICache.txt");
-    ifstream dcache("input/DCache.txt");
-    ifstream rf("input/RF.txt");
-    ofstream dCacheOutput("output/ODCache.txt");
-    ofstream rfOutput("output/ORF.txt");
-    ofstream stats("output/Output.txt");
+    int cc=0;
+    while(!stop)
+    {
+        //cout<<cc<<"------------------------------------------"<<endl;
+        execute_cycle();
+        //cout<<"--------------------------------------------"<<endl;
+        //printROB();
+        cc++;
+    }
 
-    ICache(icache);
-    DCache(dcache);
-    RegisterFile(rf);
+    dcache.output(dCacheOutput);
+    ARF.output(rfOutput);
 
-    execute_cycle();
+    stats<<"Total instructions              : "<<instr<<endl;
+    stats<<"Total Arithmatic instructions   : "<<arith<<endl;
+    stats<<"Total Load instructions         : "<<load<<endl;
+    stats<<"Total Store instructions        : "<<store<<endl;
+    stats<<"Total Branch instructions       : "<<branch<<endl;
+    stats<<"Total Halt instructions         : "<<hlt_cnt<<endl;
+    stats<<"Total cycles                    : "<<cc<<endl;
+    stats<<"Total cycles per instruction    : "<<(double)cc/instr<<endl;
 }
