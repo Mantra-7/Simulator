@@ -343,9 +343,33 @@ flag halt=false;
 flag stop=false;
 vector<ROBelem> ROB;
 
+bool operator==(Register a, Register b)
+{
+    bool ans = true;
+    ans = ans && (a.tag == b.tag);
+    ans = ans && (a.busy == b.busy);
+    ans = ans && (a.valid == b.valid);
+    return ans;
+}
+
 bool operator==(const dispbufelem &x, const dispbufelem &y)
 {
-    
+    bool ans = true;
+    ans = ans && (x.instruction == y.instruction);
+    ans = ans && (x.opcode == y.opcode);
+    ans = ans && (x.subop == y.subop);
+    ans = ans && (x.arithmatic == y.arithmatic);
+    ans = ans && (x.logical == y.logical);
+    ans = ans && (x.branch == y.branch);
+    ans = ans && (x.load == y.load);
+    ans = ans && (x.store == y.store);
+    ans = ans && (x.jump == y.jump);
+    ans = ans && (x.beqz == y.beqz);
+    ans = ans && (x.halt == y.halt);
+    ans = ans && (x.src1 == y.src1);
+    ans = ans && (x.src2 == y.src2);
+    ans = ans && (x.dest == y.dest);
+    return ans;
 }
 
 void Fetch()
@@ -760,8 +784,9 @@ void intexecute()
             RRF.R[tag].write(result);
             RRF.R[tag].valid = true;
         }
-
-
+        int indInROB = findInROB(inst);
+        ROB[indInROB].finished = true;
+        
     }
 }
 
