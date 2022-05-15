@@ -1,5 +1,5 @@
-#include <iostream>
-#include <fstream>
+#include <bits/stdc++.h>
+
 using namespace std;
 
 #define BLOCK_SIZE 4
@@ -35,6 +35,7 @@ public:
     int8 read(int Pos);
     void write(int Pos, int8 val);
     void output(ofstream &fout);
+    RegisterFile(){}
     RegisterFile(ifstream &rf);
 };
 
@@ -147,6 +148,46 @@ void DCache::write(int8 addr, int8 val)
     int offset = addr & 3;
     m_data[set].m_offset[offset] = val;
 }
+
+DCache::DCache(ifstream &fin)
+{
+    int8 addr = 0;
+    int8 input;
+    while(fin>>hex>>input)
+    {
+        this->write(addr, input);
+        addr += 1;
+    }
+}
+
+void DCache::output(ofstream &fout)
+{
+    for(int i = 0; i < NUM_SETS; i++)
+    {
+        for(int j = 0; j < BLOCK_SIZE; j++)
+        {
+            int y=(int)m_data[i].m_offset[j];
+            fout<<hex<<((y&0xf0)>>4)<<(y&0xf)<<endl;
+        }
+    }
+}
+
+ICache::ICache(ifstream &fin)
+{
+    int8 addr = 0;
+    int16 input;
+
+    while(fin>>hex>>input)
+    {
+        int16 x = input;
+        fin>>hex>>input;
+        x = (x<<8) + input;
+        //cout<<"input "<<x<<endl;
+        write(addr, x);
+        addr += 2;
+    }
+}
+
 
 int16 ICache::request(int8 addr)
 {
@@ -272,6 +313,19 @@ public:
     dispbufelem elem;
     flag busy;
     flag ready;
+    ResStElem() : busy(false), ready(false){}
+};
+
+class ROBelem
+{
+public:
+    flag busy;
+    flag issued;
+    flag finished;
+    dispbufelem elem;
+    flag valid;
+    ROBelem() : busy(false) {}
+    ROBelem(dispbufelem d) : elem(d), busy(true) {}
 };
 
 PC pc;
@@ -285,9 +339,19 @@ dispbufelem DispatchBuf[8];
 ResStElem intResSt[8];
 ResStElem branchResSt[8];
 ResStElem loadStoreResSt[8];
+flag halt=false;
+flag stop=false;
+vector<ROBelem> ROB;
+
+bool operator==(const dispbufelem &x, const dispbufelem &y)
+{
+    
+}
 
 void Fetch()
 {
+    if(halt) return;
+
     int free=-1;
     for(int i=0;i<8;i++)
     {
@@ -581,6 +645,7 @@ void Dispatch()
                         intResSt[j].busy = true;
                         intResSt[j].ready = false;
                         passed = true;
+                        ROB.push_back(ROBelem(DispatchBuf[i]));
                         break;
                     }
                 }
@@ -602,6 +667,7 @@ void Dispatch()
                         branchResSt[j].busy = true;
                         branchResSt[j].ready = false;
                         passed = true;
+                        ROB.push_back(ROBelem(DispatchBuf[i]));
                         break;
                     }
                 }
@@ -623,6 +689,7 @@ void Dispatch()
                         loadStoreResSt[j].busy = true;
                         loadStoreResSt[j].ready = false;
                         passed = true;
+                        ROB.push_back(ROBelem(DispatchBuf[i]));
                         break;
                     }
                 }
@@ -632,7 +699,21 @@ void Dispatch()
                     DispatchBuf[i].busy = false;
                 }
             }
+
+            if(DispatchBuf[i].halt)
+            {
+                ROB.push_back(ROBelem(DispatchBuf[i]));
+                halt=true;
+            }
         }
+    }
+}
+
+int findInROB(dispbufelem inst)
+{
+    for(int i=0;i<ROB.size();i++)
+    {
+        if(ROB[i].elem == inst) return i;
     }
 }
 
@@ -679,6 +760,8 @@ void intexecute()
             RRF.R[tag].write(result);
             RRF.R[tag].valid = true;
         }
+
+
     }
 }
 
@@ -766,14 +849,96 @@ void execute()
 
 void RSdispatch()
 {
-    
+    for(int i=0;i<8;i++)
+    {
+        if(intResSt[i].busy)
+        {
+            dispbufelem x = intResSt[i].elem;
+            bool ready=true;
+
+            if(x.opcode != 3 && x.opcode!=6)
+            {
+                if(x.src1.tag!=-1)
+                {
+                    if(!RRF.R[x.src1.tag].valid) ready=false;
+                }
+            }
+
+            if(x.src2.tag!=-1)
+            {
+                if(!RRF.R[x.src2.tag].valid) ready=false;
+            }
+
+            intResSt[i].ready = ready;
+        }
+    }
+
+    for(int i=0;i<8;i++)
+    {
+        if(branchResSt[i].busy)
+        {
+            dispbufelem x = branchResSt[i].elem;
+            bool ready=true;
+            if(x.src1.tag!=-1)
+            {
+                if(!RRF.R[x.src1.tag].valid) ready=false;
+            }
+
+            if(x.src2.tag!=-1)
+            {
+                if(!RRF.R[x.src2.tag].valid) ready=false;
+            }
+
+            branchResSt[i].ready = ready;
+        }
+    }
+
+    for(int i=0;i<8;i++)
+    {
+        if(loadStoreResSt[i].busy)
+        {
+            dispbufelem x = loadStoreResSt[i].elem;
+            bool ready=true;
+
+            if(x.load)
+            {
+                if(x.src1.tag!=-1)
+                {
+                    if(!RRF.R[x.src1.tag].valid) ready=false;
+                }
+            }
+
+            if(x.src2.tag!=-1)
+            {
+                if(!RRF.R[x.src2.tag].valid) ready=false;
+            }
+
+            loadStoreResSt[i].ready = ready;
+        }
+    }
 }
 
 void execute_cycle()
 {
-    execute();
     RSdispatch();
+    execute();
     Dispatch();
     Decode();
     Fetch();
+}
+
+int main()
+{
+    ifstream icache("input/ICache.txt");
+    ifstream dcache("input/DCache.txt");
+    ifstream rf("input/RF.txt");
+    ofstream dCacheOutput("output/ODCache.txt");
+    ofstream rfOutput("output/ORF.txt");
+    ofstream stats("output/Output.txt");
+
+    ICache(icache);
+    DCache(dcache);
+    RegisterFile(rf);
+
+    execute_cycle();
 }
