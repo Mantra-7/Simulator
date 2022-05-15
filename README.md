@@ -6,6 +6,8 @@ You can also use assembler given to make binary instructions from assembly. Buti
 
 There are 2 versions of this simulator. One of them has all code in a single file named PipelineProcessor.cpp and other has code distributed over multiple c++ files.
 
+We have also made Super Scalar processor which has multiple pipelines for various type of instructions and can execute instructions in out of order fashion. Current version does not support branch instructions.
+
 ## Instructions to run assembler:
 
 Go to Assembler folder -
@@ -26,6 +28,11 @@ Put all inputs properly in input folder by running above code.
 
 g++ PipelineProcessor.cpp -o PipelineProcessor\
 ./PipelineProcessor
+
+### Super Scalar Version:
+
+g++ SuperScalar.cpp -o SuperScalar\
+./SuperScalar
 
 ### Distributed Version:
 
