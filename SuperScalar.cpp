@@ -288,12 +288,14 @@ void PC::decrement()
 class instbufelem{
 public:
     int16 instruction;
+    int8 addr;
     bool busy;
 };
 
 class dispbufelem{
 public:
     int16 instruction;
+    int8 addr;
     int opcode;
     int subop;
     bool busy;
@@ -360,12 +362,14 @@ RegisterFile ARF(rf);
 RenameRegisterFile RRF;
 instbufelem FetchDecodeBuf[8];
 dispbufelem DispatchBuf[256];
-ResStElem intResSt[8];
-ResStElem branchResSt[8];
-ResStElem loadStoreResSt[8];
+ResStElem intRS[8];
+ResStElem branchRS[8];
+ResStElem loadStoreRS[8];
+vector<ROBelem> ROB;
+
 flag halt=false;
 flag stop=false;
-vector<ROBelem> ROB;
+int16 branch_instru;
 
 bool operator==(Register a, Register b)
 {
@@ -401,8 +405,9 @@ void Fetch()
     if(free!=-1)
     {
         int8 addr = pc.read();
-        pc.increment();
         FetchDecodeBuf[free].instruction = icache.request(addr);
+        FetchDecodeBuf[free].addr = addr;
+        pc.increment();
         //cout<<"Fetch: "<<hex<<(int)FetchDecodeBuf[free].instruction<<endl;
     }
 }
@@ -456,6 +461,7 @@ void Decode()
         DispatchBuf[free].jump = false;
         DispatchBuf[free].halt = false;
         DispatchBuf[free].instruction = instruction;
+        DispatchBuf[free].addr = FetchDecodeBuf[instfree].addr;
 
         int16 opcode = instruction >> 12;
         DispatchBuf[free].opcode = opcode;
@@ -651,13 +657,37 @@ void Decode()
         //jmp
         if(opcode == 10)
         {
-            //huh
+            halt = true;
+            branch_instru = instruction;
+
+            int offset = (instruction & 0x0ff0) >> 4;
+
+            DispatchBuf[free].jump = true;
+            DispatchBuf[free].offset = offset;
         }
 
         //beqz
         if(opcode == 11)
         {
-            //huh
+            DispatchBuf[free].beqz = true;
+
+            int offset = (instruction & 0x00ff);
+            int8 r1 = (instruction & 0x0f00)>>8;
+
+            DispatchBuf[free].offset = offset;
+
+            if(!ARF.R[r1].busy)
+            {
+                DispatchBuf[free].src1 = ARF.R[r1];
+            }
+            else
+            {
+                int tag = ARF.R[r1].tag;
+                DispatchBuf[free].src1.tag = tag;
+            }
+
+            halt = true;
+            branch_instru = instruction;
         }
 
         if(opcode==15)
@@ -670,7 +700,6 @@ void Decode()
 
 void Dispatch()
 {
-    if(halt) return;
 
     for(int i=0;i<256;i++)
     {
@@ -681,11 +710,11 @@ void Dispatch()
                 flag passed=false;
                 for(int j=0;j<8;j++)
                 {
-                    if(!intResSt[j].busy)
+                    if(!intRS[j].busy)
                     {
-                        intResSt[j].elem = DispatchBuf[i];
-                        intResSt[j].busy = true;
-                        intResSt[j].ready = false;
+                        intRS[j].elem = DispatchBuf[i];
+                        intRS[j].busy = true;
+                        intRS[j].ready = false;
                         passed = true;
                         ROB.push_back(ROBelem(DispatchBuf[i]));
                         //cout<<"Dispatching "<<DispatchBuf[i].instruction<<endl;
@@ -705,11 +734,11 @@ void Dispatch()
                 flag passed=false;
                 for(int j=0;j<8;j++)
                 {
-                    if(!branchResSt[j].busy)
+                    if(!branchRS[j].busy)
                     {
-                        branchResSt[j].elem = DispatchBuf[i];
-                        branchResSt[j].busy = true;
-                        branchResSt[j].ready = false;
+                        branchRS[j].elem = DispatchBuf[i];
+                        branchRS[j].busy = true;
+                        branchRS[j].ready = false;
                         passed = true;
                         ROB.push_back(ROBelem(DispatchBuf[i]));
                         //cout<<"Dispatching "<<DispatchBuf[i].instruction<<endl;
@@ -728,11 +757,11 @@ void Dispatch()
                 flag passed=false;
                 for(int j=0;j<8;j++)
                 {
-                    if(!loadStoreResSt[j].busy)
+                    if(!loadStoreRS[j].busy)
                     {
-                        loadStoreResSt[j].elem = DispatchBuf[i];
-                        loadStoreResSt[j].busy = true;
-                        loadStoreResSt[j].ready = false;
+                        loadStoreRS[j].elem = DispatchBuf[i];
+                        loadStoreRS[j].busy = true;
+                        loadStoreRS[j].ready = false;
                         passed = true;
                         ROB.push_back(ROBelem(DispatchBuf[i]));
                         // //cout<<"Dispatching "<<DispatchBuf[i].instruction<<"in loadStore"<<endl;
@@ -767,7 +796,7 @@ void intexecute()
     int ready=-1;
     for(int i=0;i<8;i++)
     {
-        if(intResSt[i].busy && intResSt[i].ready)
+        if(intRS[i].busy && intRS[i].ready)
         {
             ready=i;
             break;
@@ -778,9 +807,9 @@ void intexecute()
 
     if(ready!=-1)
     {
-        intResSt[ready].busy=false;
-        //cout<<"intexecute :"<<hex<<intResSt[ready].elem.instruction<<endl;
-        dispbufelem inst = intResSt[ready].elem;
+        intRS[ready].busy=false;
+        //cout<<"intexecute :"<<hex<<intRS[ready].elem.instruction<<endl;
+        dispbufelem inst = intRS[ready].elem;
         
         if(inst.arithmatic)
         {
@@ -876,7 +905,7 @@ void loadstoreexecute()
     int ready=-1;
     for(int i=0;i<8;i++)
     {
-        if(loadStoreResSt[i].busy && loadStoreResSt[i].ready)
+        if(loadStoreRS[i].busy && loadStoreRS[i].ready)
         {
             ready=i;
             break;
@@ -892,17 +921,65 @@ void loadstoreexecute()
     }
     else
     {
-        loadStoreResSt[ready].busy=false;
-        lsbuff[0] = loadStoreResSt[ready].elem;
+        loadStoreRS[ready].busy=false;
+        lsbuff[0] = loadStoreRS[ready].elem;
     }
     loading(lsbuff[2]);
     addressTranslation(lsbuff[1]);
     addressGeneration(lsbuff[0]);
 }
 
+int sign_Extension8(int x)
+{
+    if(x>127)
+        return x-256;
+    else
+        return x;
+}
+
+int sign_Extension4(int x)
+{
+    if(x>7)
+        return x-16;
+    else return x;
+}
+
 void branchexecute()
 {
-    
+    int ready=-1;
+    for(int i=0;i<8;i++)
+    {
+        if(branchRS[i].busy && branchRS[i].ready)
+        {
+            ready=i;
+            break;
+        }
+    }
+
+    if(ready!=-1)
+    {
+        pc.write(branchRS[ready].elem.addr);
+        pc.increment();
+
+        dispbufelem d = branchRS[ready].elem;
+
+        if(d.jump)
+        {
+            pc.write(alu.adder(pc.read(),sign_Extension8(d.offset)<<1,0));
+        }
+
+        if(d.beqz)
+        {
+            bool x = alu.BEQZ(d.src1.read());
+            if(x)
+            {
+                pc.write(alu.adder(pc.read(),sign_Extension8(d.offset) << 1,0));
+            }
+        }
+
+        int indInROB = findInROB(d);
+        ROB[indInROB].finished = true;
+    }
 }
 
 void execute()
@@ -916,9 +993,9 @@ void RSdispatch()
 {
     for(int i=0;i<8;i++)
     {
-        if(intResSt[i].busy && !intResSt[i].ready)
+        if(intRS[i].busy && !intRS[i].ready)
         {
-            dispbufelem x = intResSt[i].elem;
+            dispbufelem x = intRS[i].elem;
             bool ready=true;
 
             if(x.opcode != 6)
@@ -928,7 +1005,7 @@ void RSdispatch()
                     if(!RRF.R[x.src1.tag].valid) ready=false;
                     else
                     {
-                        intResSt[i].elem.src1.write(RRF.R[x.src1.tag].read());
+                        intRS[i].elem.src1.write(RRF.R[x.src1.tag].read());
                     }
                 }
             }
@@ -940,52 +1017,47 @@ void RSdispatch()
                     if(!RRF.R[x.src2.tag].valid) ready=false;
                     else
                     {
-                        intResSt[i].elem.src2.write(RRF.R[x.src2.tag].read());
+                        intRS[i].elem.src2.write(RRF.R[x.src2.tag].read());
                     }
                 }
             }
 
-            intResSt[i].ready = ready;
+            intRS[i].ready = ready;
             if(ready)
             {
-                //cout<<"RSDispatch :"<<intResSt[i].elem.instruction<<endl;
+                //cout<<"RSDispatch :"<<intRS[i].elem.instruction<<endl;
             }
         }
     }
 
     for(int i=0;i<8;i++)
     {
-        if(branchResSt[i].busy && !branchResSt[i].ready)
+        if(branchRS[i].busy && !branchRS[i].ready)
         {
-            dispbufelem x = branchResSt[i].elem;
+            dispbufelem x = branchRS[i].elem;
             bool ready=true;
-            if(x.src1.tag!=-1)
+
+            if(x.beqz)
             {
-                if(!RRF.R[x.src1.tag].valid) ready=false;
-                else
+                if(x.src1.tag!=-1)
+                {
+                    if(!RRF.R[x.src1.tag].valid) ready=false;
+                    else
                     {
-                        branchResSt[i].elem.src1.write(RRF.R[x.src1.tag].read());
+                        branchRS[i].elem.src1.write(RRF.R[x.src1.tag].read());
                     }
+                }
             }
 
-            if(x.src2.tag!=-1)
-            {
-                if(!RRF.R[x.src2.tag].valid) ready=false;
-                else
-                    {
-                        branchResSt[i].elem.src2.write(RRF.R[x.src2.tag].read());
-                    }
-            }
-
-            branchResSt[i].ready = ready;
+            branchRS[i].ready = ready;
         }
     }
 
     for(int i=0;i<8;i++)
     {
-        if(loadStoreResSt[i].busy && !loadStoreResSt[i].ready)
+        if(loadStoreRS[i].busy && !loadStoreRS[i].ready)
         {
-            dispbufelem x = loadStoreResSt[i].elem;
+            dispbufelem x = loadStoreRS[i].elem;
             bool ready=true;
             //cout<<"RSdispatch : "<<hex<<x.instruction<<" "<<dec<<x.src1.tag<<" "<<x.src2.tag<<endl;
 
@@ -996,7 +1068,7 @@ void RSdispatch()
                     if(!RRF.R[x.src1.tag].valid) ready=false;
                     else
                     {
-                        loadStoreResSt[i].elem.src1.write(RRF.R[x.src1.tag].read());
+                        loadStoreRS[i].elem.src1.write(RRF.R[x.src1.tag].read());
                     }
                 }
             }
@@ -1006,11 +1078,11 @@ void RSdispatch()
                 if(!RRF.R[x.src2.tag].valid) ready=false;
                 else
                     {
-                        loadStoreResSt[i].elem.src2.write(RRF.R[x.src2.tag].read());
+                        loadStoreRS[i].elem.src2.write(RRF.R[x.src2.tag].read());
                     }
             }
 
-            loadStoreResSt[i].ready = ready;
+            loadStoreRS[i].ready = ready;
         }
     }
 }
@@ -1025,6 +1097,12 @@ void popROB()
     if(x.finished)
     {
         dispbufelem d = x.elem;
+
+        if(d.beqz || d.jump)
+        {
+            flushAll();
+            halt = false;
+        }
 
         instr++;
 
