@@ -303,7 +303,6 @@ public:
 
     flag arithmatic;
     flag logical;
-    flag branch;
     flag load;
     flag store;
     flag jump;
@@ -369,7 +368,6 @@ vector<ROBelem> ROB;
 
 flag halt=false;
 flag stop=false;
-int16 branch_instru;
 
 bool operator==(Register a, Register b)
 {
@@ -421,6 +419,7 @@ int findFree()
             return i;
         }
     }
+    return -1;
 }
 
 void Decode()
@@ -467,7 +466,7 @@ void Decode()
         DispatchBuf[free].opcode = opcode;
         DispatchBuf[free].subop = (opcode & 0x3);
 
-        //cout<<"Decode: "<<(int)instruction<<endl;
+        //cout<<"Decode: "<<hex<<(int)instruction<<endl;
         if(opcode<4)
         {
             DispatchBuf[free].arithmatic = true;
@@ -658,7 +657,6 @@ void Decode()
         if(opcode == 10)
         {
             halt = true;
-            branch_instru = instruction;
 
             int offset = (instruction & 0x0ff0) >> 4;
 
@@ -687,7 +685,6 @@ void Decode()
             }
 
             halt = true;
-            branch_instru = instruction;
         }
 
         if(opcode==15)
@@ -717,7 +714,7 @@ void Dispatch()
                         intRS[j].ready = false;
                         passed = true;
                         ROB.push_back(ROBelem(DispatchBuf[i]));
-                        //cout<<"Dispatching "<<DispatchBuf[i].instruction<<endl;
+                        //cout<<"Dispatching "<<hex<<DispatchBuf[i].instruction<<endl;
                         break;
                     }
                 }
@@ -789,6 +786,7 @@ int findInROB(dispbufelem inst)
             return i;
         }
     }
+    return -1;
 }
 
 void intexecute()
@@ -850,14 +848,21 @@ dispbufelem lsbuff[3];
 int addressbuf = -1;
 int destaddressbuf = -1;
 
+int sign_Extension4(int x)
+{
+    if(x>7)
+        return x-16;
+    else return x;
+}
+
 void addressGeneration(dispbufelem inst)
 {
     if(inst.busy)
     {
-        // //cout<<"Load/Store 1 :"<<inst.instruction<<endl;
+        //cout<<"Load/Store 1 :"<<hex<<inst.instruction<<endl;
         int src2 = inst.src2.read();
         int offset = inst.offset;
-        int result = alu.adder(src2,offset,0);
+        int result = alu.adder(src2,sign_Extension4(offset),0);
         addressbuf = result;
     }
 }
@@ -867,7 +872,7 @@ void addressTranslation(dispbufelem inst)
 
     if(addressbuf!=-1 && inst.busy)
     {
-        // //cout<<"Load/Store 2 :"<<inst.instruction<<endl;
+        //cout<<"Load/Store 2 :"<<hex<<inst.instruction<<endl;
         if(inst.load)
         {
             destaddressbuf = dcache.request(addressbuf);
@@ -887,7 +892,7 @@ void loading(dispbufelem inst)
 {
     if(destaddressbuf!=-1 && inst.busy)
     {
-        // //cout<<"Load/Store 3 :"<<inst.instruction<<endl;
+        //cout<<"Load/Store 3 :"<<hex<<inst.instruction<<endl;
         if(inst.load)
         {
             int tag = inst.dest;
@@ -937,12 +942,6 @@ int sign_Extension8(int x)
         return x;
 }
 
-int sign_Extension4(int x)
-{
-    if(x>7)
-        return x-16;
-    else return x;
-}
 
 void branchexecute()
 {
@@ -962,6 +961,8 @@ void branchexecute()
         pc.increment();
 
         dispbufelem d = branchRS[ready].elem;
+
+        //cout<<"Branchexecute : "<<hex<<d.instruction<<endl;
 
         if(d.jump)
         {
@@ -1059,7 +1060,6 @@ void RSdispatch()
         {
             dispbufelem x = loadStoreRS[i].elem;
             bool ready=true;
-            //cout<<"RSdispatch : "<<hex<<x.instruction<<" "<<dec<<x.src1.tag<<" "<<x.src2.tag<<endl;
 
             if(x.store)
             {
@@ -1083,10 +1083,31 @@ void RSdispatch()
             }
 
             loadStoreRS[i].ready = ready;
+            if(ready)
+            {
+            //cout<<"RSdispatch : "<<hex<<x.instruction<<" "<<dec<<x.src1.tag<<" "<<x.src2.tag<<endl;
+
+            }
         }
     }
 }
 
+void flushAll()
+{
+    ROB.clear();
+    for(int i=0;i<8;i++)
+    {
+        intRS[i].busy = false;
+        branchRS[i].busy = false;
+        loadStoreRS[i].busy = false;
+        FetchDecodeBuf[i].busy = false;
+    }
+
+    for(int i=0;i<256;i++)
+    {
+        DispatchBuf[i].busy = false;
+    }
+}
 
 void popROB()
 {
@@ -1096,26 +1117,35 @@ void popROB()
 
     if(x.finished)
     {
+        ROB.erase(ROB.begin());
+
         dispbufelem d = x.elem;
+        //cout<<"ROB "<<hex<<d.instruction<<endl;
 
         if(d.beqz || d.jump)
         {
             flushAll();
+            // //cout<<"changed halt"<<endl;
             halt = false;
         }
 
         instr++;
 
         if(d.arithmatic) arith++;
+        else if(d.logical) logic++;
         else if(d.load) load++;
         else if(d.store) store++;
-        else if(d.branch) branch++;
+        else if(d.beqz || d.jump) branch++;
         else if(d.halt) hlt_cnt++;
-
 
         if(d.halt) 
         {
             stop=true;
+            return;
+        }
+
+        if(d.beqz || d.store || d.jump)
+        {
             return;
         }
 
@@ -1132,8 +1162,6 @@ void popROB()
                 ARF.R[i].write(val);
             }
         }
-
-        ROB.erase(ROB.begin());
     }
 }
 
@@ -1156,29 +1184,25 @@ void printROB()
 
 void execute_cycle()
 {
-    RSdispatch();
-    // //cout<<1<<endl;
-    Dispatch();
-    // //cout<<2<<endl;
-    execute();
-    // //cout<<3<<endl;
-    Decode();
-    // //cout<<4<<endl;
-    Fetch();
-    // //cout<<5<<endl;        
     popROB();
-    // //cout<<6<<endl;
+    RSdispatch();
+    execute();
+    Dispatch();
+    Decode();
+    Fetch();
+
 }
 
 int main()
 {
     int cc=0;
     while(!stop)
+    //for(int i=0;i<20;i++)
     {
         //cout<<cc<<"------------------------------------------"<<endl;
         execute_cycle();
         //cout<<"--------------------------------------------"<<endl;
-        //printROB();
+        printROB();
         cc++;
     }
 
@@ -1187,6 +1211,7 @@ int main()
 
     stats<<"Total instructions              : "<<instr<<endl;
     stats<<"Total Arithmatic instructions   : "<<arith<<endl;
+    stats<<"Total Logical instructions      : "<<logic<<endl;
     stats<<"Total Load instructions         : "<<load<<endl;
     stats<<"Total Store instructions        : "<<store<<endl;
     stats<<"Total Branch instructions       : "<<branch<<endl;
