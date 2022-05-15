@@ -764,6 +764,11 @@ void execute()
     loadstoreexecute();
 }
 
+void RSdispatch()
+{
+    
+}
+
 void execute_cycle()
 {
     execute();
