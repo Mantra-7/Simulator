@@ -1,8 +1,9 @@
 Total instructions              : 8
 Total Arithmatic instructions   : 3
+Total Logical instructions      : 1
 Total Load instructions         : 2
 Total Store instructions        : 1
 Total Branch instructions       : 0
 Total Halt instructions         : 1
-Total cycles                    : 15
-Total cycles per instruction    : 1.875
+Total cycles                    : 16
+Total cycles per instruction    : 2
